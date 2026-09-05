@@ -3,7 +3,6 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 import time
-import textwrap
 from datetime import datetime
 from typing import Optional, Dict, Any
 
@@ -18,84 +17,105 @@ st.set_page_config(
 )
 
 def render_html(html_str: str):
-    """Safely render dedented HTML in Streamlit without markdown code block triggers."""
-    st.markdown(textwrap.dedent(html_str).strip(), unsafe_allow_html=True)
+    """
+    Safely render HTML in Streamlit.
+    Strips all linebreaks and whitespace so Markdown parser NEVER triggers code block <pre><code> mode.
+    """
+    cleaned_html = " ".join([line.strip() for line in html_str.splitlines() if line.strip()])
+    st.markdown(cleaned_html, unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. GLOBAL THEME & STYLES (Professional Enterprise Palette)
+# 2. GLOBAL THEME & HIGH-CONTRAST DARK TYPOGRAPHY STYLES
 # ==============================================================================
 render_html("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
     
     html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: #0f172a;
     }
     
     .stApp {
-        background-color: #f8fafc;
+        background-color: #f1f5f9;
+    }
+
+    /* High Contrast Text Classes */
+    .text-dark-primary {
+        color: #0f172a !important;
+        font-weight: 800;
+    }
+    
+    .text-dark-secondary {
+        color: #1e293b !important;
+        font-weight: 600;
+    }
+
+    .text-dark-muted {
+        color: #334155 !important;
+        font-weight: 500;
     }
 
     /* Professional Card Containers */
     .saas-card {
         background: #ffffff;
-        border: 1px solid #e2e8f0;
+        border: 1px solid #cbd5e1;
         border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+        padding: 24px;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
         margin-bottom: 16px;
     }
 
     .metric-container {
         background: #ffffff;
-        border: 1px solid #e2e8f0;
+        border: 1px solid #cbd5e1;
         border-radius: 12px;
-        padding: 16px 20px;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+        padding: 18px 20px;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.04);
     }
 
     .metric-label {
         font-size: 12px;
-        font-weight: 600;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: #64748b;
+        color: #334155;
         margin-bottom: 4px;
     }
 
     .metric-value {
-        font-size: 28px;
-        font-weight: 800;
+        font-size: 30px;
+        font-weight: 900;
         color: #0f172a;
         line-height: 1.1;
     }
 
     .metric-subtext {
-        font-size: 11px;
-        font-weight: 600;
+        font-size: 12px;
+        font-weight: 700;
         margin-top: 6px;
     }
 
-    .subtext-positive { color: #059669; }
-    .subtext-neutral { color: #64748b; }
-    .subtext-warning { color: #d97706; }
+    .subtext-positive { color: #047857; }
+    .subtext-neutral { color: #334155; }
+    .subtext-warning { color: #b45309; }
 
     /* Recommended Next Step Banner */
     .rec-banner {
-        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
         color: #ffffff;
         border-radius: 12px;
-        padding: 22px 26px;
+        padding: 24px 28px;
         margin-bottom: 20px;
-        box-shadow: 0 4px 12px -2px rgba(30, 58, 138, 0.25);
+        box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.3);
     }
 
     .rec-badge {
-        background: rgba(255, 255, 255, 0.15);
-        color: #93c5fd;
+        background: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
         font-size: 11px;
-        font-weight: 700;
-        padding: 3px 10px;
+        font-weight: 800;
+        padding: 4px 12px;
         border-radius: 6px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -106,48 +126,23 @@ render_html("""
     /* Badges */
     .badge {
         display: inline-block;
-        padding: 3px 10px;
+        padding: 4px 10px;
         border-radius: 6px;
         font-size: 11px;
-        font-weight: 700;
+        font-weight: 800;
     }
-    .badge-success { background: #dcfce7; color: #15803d; }
-    .badge-warning { background: #fef3c7; color: #b45309; }
-    .badge-danger { background: #fee2e2; color: #b91c1c; }
-    .badge-info { background: #dbeafe; color: #1d4ed8; }
-
-    /* Microsoft Login Button */
-    .ms-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        width: 100%;
-        height: 48px;
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        border-radius: 10px;
-        color: #1e293b;
-        font-size: 14px;
-        font-weight: 700;
-        cursor: pointer;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        transition: all 0.2s ease;
-        text-decoration: none;
-    }
-    .ms-btn:hover {
-        background: #f8fafc;
-        border-color: #94a3b8;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-    }
+    .badge-success { background: #dcfce7; color: #166534; }
+    .badge-warning { background: #fef3c7; color: #92400e; }
+    .badge-danger { background: #fee2e2; color: #991b1b; }
+    .badge-info { background: #dbeafe; color: #1e40af; }
 
     /* Activity & Timeline */
     .activity-item {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 12px 0;
-        border-bottom: 1px solid #f1f5f9;
+        padding: 14px 0;
+        border-bottom: 1px solid #e2e8f0;
     }
     .activity-item:last-child {
         border-bottom: none;
@@ -157,36 +152,34 @@ render_html("""
         display: flex;
         align-items: flex-start;
         gap: 14px;
-        padding: 14px 0;
-        border-bottom: 1px solid #f1f5f9;
+        padding: 16px 0;
+        border-bottom: 1px solid #e2e8f0;
     }
     .timeline-item:last-child {
         border-bottom: none;
     }
 
     .step-number {
-        width: 28px;
-        height: 28px;
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
-        background: #f1f5f9;
-        color: #475569;
-        font-weight: 700;
-        font-size: 12px;
+        background: #e2e8f0;
+        color: #0f172a;
+        font-weight: 800;
+        font-size: 13px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
     }
-    .step-active { background: #2563eb; color: #ffffff; }
-    .step-done { background: #10b981; color: #ffffff; }
+    .step-active { background: #1d4ed8; color: #ffffff; }
+    .step-done { background: #059669; color: #ffffff; }
 </style>
 """)
 
 # ==============================================================================
 # 3. DATABASE USER REGISTRY & REPOSITORY
 # ==============================================================================
-# Authoritative database of institutional users
-# Real Microsoft authentication verifies identity; the database determines role and authorization.
 INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
     "likith@college.edu": {
         "id": "STU001",
@@ -386,7 +379,7 @@ def perform_logout():
 current_identity = get_authenticated_identity()
 
 # ==============================================================================
-# 5. LOGIN VIEW (WHEN USER IS NOT AUTHENTICATED)
+# 5. LOGIN VIEW (HIGH-CONTRAST DARK TEXT & PURE HTML RENDERING)
 # ==============================================================================
 if not current_identity:
     st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
@@ -394,34 +387,27 @@ if not current_identity:
     col_left, col_mid_space, col_right = st.columns([1.2, 0.1, 1.1])
     
     # -------------------------------------------------------------------------
-    # LEFT BRANDING SECTION
+    # LEFT BRANDING SECTION (DARK, BOLD, CRISP TYPOGRAPHY)
     # -------------------------------------------------------------------------
     with col_left:
         render_html("""
-        <div style="padding: 30px 10px;">
-            <div style="width: 44px; height: 44px; background: #1e3a8a; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 22px; margin-bottom: 24px;">
+        <div style="padding: 24px 10px;">
+            <div style="width: 48px; height: 48px; background: #0f172a; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 24px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(15,23,42,0.2);">
                 🎓
             </div>
-            
-            <div style="font-size: 13px; font-weight: 800; color: #2563eb; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">
-                Institutional Portal
+            <div style="font-size: 13px; font-weight: 800; color: #1d4ed8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
+                Institutional Placement System
             </div>
-            
-            <h1 style="font-size: 38px; font-weight: 900; color: #0f172a; line-height: 1.1; margin: 0 0 16px 0; letter-spacing: -0.5px;">
-                PLACEMENT<br>
-                TRAINING<br>
-                PORTAL
+            <h1 style="font-size: 38px; font-weight: 900; color: #0f172a; line-height: 1.15; margin: 0 0 16px 0; letter-spacing: -0.5px;">
+                PLACEMENT<br>TRAINING<br>PORTAL
             </h1>
-            
-            <div style="font-size: 16px; font-weight: 700; color: #1e40af; margin-bottom: 12px;">
+            <div style="font-size: 17px; font-weight: 800; color: #1e3a8a; margin-bottom: 12px;">
                 Prepare smarter. Perform better. Get placement ready.
             </div>
-            
-            <p style="font-size: 14px; color: #64748b; line-height: 1.6; max-width: 460px; margin-bottom: 28px;">
-                Personalized placement preparation, assessments, performance insights, and career readiness in one platform.
+            <p style="font-size: 14px; color: #334155; line-height: 1.6; max-width: 460px; margin-bottom: 24px; font-weight: 500;">
+                Personalized placement preparation, assessments, performance insights, and career readiness in one unified platform.
             </p>
-            
-            <div style="display: flex; gap: 20px; font-size: 12px; color: #475569; font-weight: 600; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+            <div style="display: flex; gap: 20px; font-size: 13px; color: #0f172a; font-weight: 700; border-top: 2px solid #cbd5e1; padding-top: 18px;">
                 <div>🔒 Microsoft Entra ID Protected</div>
                 <div>🛡️ Granular Institutional RBAC</div>
             </div>
@@ -429,15 +415,16 @@ if not current_identity:
         """)
 
     # -------------------------------------------------------------------------
-    # RIGHT LOGIN CARD (CLEAN & MINIMAL WITH MICROSOFT AUTH)
+    # RIGHT LOGIN CARD (CRISP WHITE CARD WITH BOLD DARK TEXT)
     # -------------------------------------------------------------------------
     with col_right:
         render_html("""
-        <div class="saas-card" style="padding: 40px 36px; max-width: 440px; margin: 0 auto; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06);">
-            <h2 style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">Welcome Back</h2>
-            <p style="font-size: 13px; color: #64748b; margin: 0 0 28px 0;">
+        <div class="saas-card" style="padding: 36px 32px; max-width: 440px; margin: 0 auto; border: 1px solid #cbd5e1; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+            <h2 style="font-size: 26px; font-weight: 900; color: #0f172a; margin: 0 0 8px 0;">Welcome Back</h2>
+            <p style="font-size: 14px; color: #334155; margin: 0 0 24px 0; font-weight: 600;">
                 Sign in to access your placement training portal.
             </p>
+        </div>
         """)
 
         # Official Microsoft Entra ID Login Button
@@ -457,17 +444,14 @@ if not current_identity:
                     st.session_state.authenticated_user_name = "Likith Yadav"
                     st.rerun()
             except Exception as e:
-                # If Microsoft secrets not yet configured in local secrets.toml, prompt helpful configuration
                 st.warning(f"Microsoft Entra ID not configured in secrets.toml: {e}. Use fast institutional testing below:")
 
         render_html("""
-            <div style="font-size: 12px; color: #64748b; text-align: center; margin-top: 14px; font-weight: 500;">
+        <div style="max-width: 440px; margin: 10px auto 0 auto; text-align: center;">
+            <div style="font-size: 13px; color: #1e293b; font-weight: 700; margin-bottom: 16px;">
                 Use your registered college Microsoft account.
             </div>
-            
-            <div style="margin: 24px 0 16px 0; border-top: 1px solid #f1f5f9;"></div>
-            
-            <div style="font-size: 11px; color: #94a3b8; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <div style="border-top: 1px solid #cbd5e1; padding-top: 14px; font-size: 12px; color: #475569; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px;">
                 <span>🔒</span>
                 <span>Secure authentication powered by Microsoft Entra ID</span>
             </div>
@@ -475,9 +459,8 @@ if not current_identity:
         """)
 
         # Fast Institutional Testing Switcher for Development
-        # (Allows testing all database scenarios without faking manual role choice)
         with st.expander("🛠️ Institutional Microsoft Account Simulator (Dev Mode)"):
-            st.caption("Simulates authentication from different institutional accounts to verify database-driven role resolution:")
+            st.markdown("<span style='font-size: 12px; color: #0f172a; font-weight: 700;'>Simulates authentication from different institutional accounts to verify database-driven role resolution:</span>", unsafe_allow_html=True)
             
             test_acc = st.selectbox("Select Authenticated Microsoft Identity", [
                 "likith@college.edu (STUDENT - Active)",
@@ -513,12 +496,12 @@ if not user_record:
     with col_e2:
         render_html(f"""
         <div class="saas-card" style="text-align: center; padding: 36px 30px; border-top: 4px solid #ef4444;">
-            <div style="font-size: 32px; margin-bottom: 12px;">🚫</div>
-            <h3 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">Account Not Registered</h3>
-            <p style="font-size: 13px; color: #475569; line-height: 1.5; margin-bottom: 20px;">
+            <div style="font-size: 36px; margin-bottom: 12px;">🚫</div>
+            <h3 style="font-size: 22px; font-weight: 900; color: #0f172a; margin: 0 0 8px 0;">Account Not Registered</h3>
+            <p style="font-size: 14px; color: #1e293b; line-height: 1.5; margin-bottom: 20px; font-weight: 600;">
                 Your Microsoft account (<b>{auth_email}</b>) was successfully authenticated, but it is not registered in the Placement Training Portal.
             </p>
-            <p style="font-size: 12px; color: #64748b; margin-bottom: 24px;">
+            <p style="font-size: 13px; color: #475569; margin-bottom: 24px; font-weight: 500;">
                 Please contact your college placement cell coordinator or administration to provision your student or faculty profile.
             </p>
         </div>
@@ -533,11 +516,11 @@ user_status = user_record.get("status", "ACTIVE")
 if user_status == "INACTIVE":
     col_e1, col_e2, col_e3 = st.columns([1, 2, 1])
     with col_e2:
-        render_html(f"""
+        render_html("""
         <div class="saas-card" style="text-align: center; padding: 36px 30px; border-top: 4px solid #f59e0b;">
-            <div style="font-size: 32px; margin-bottom: 12px;">⚠️</div>
-            <h3 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">Account Inactive</h3>
-            <p style="font-size: 13px; color: #475569; margin-bottom: 24px;">
+            <div style="font-size: 36px; margin-bottom: 12px;">⚠️</div>
+            <h3 style="font-size: 22px; font-weight: 900; color: #0f172a; margin: 0 0 8px 0;">Account Inactive</h3>
+            <p style="font-size: 14px; color: #1e293b; margin-bottom: 24px; font-weight: 600;">
                 Your account is currently inactive. Please contact the placement administration.
             </p>
         </div>
@@ -549,11 +532,11 @@ if user_status == "INACTIVE":
 elif user_status == "PENDING":
     col_e1, col_e2, col_e3 = st.columns([1, 2, 1])
     with col_e2:
-        render_html(f"""
+        render_html("""
         <div class="saas-card" style="text-align: center; padding: 36px 30px; border-top: 4px solid #3b82f6;">
-            <div style="font-size: 32px; margin-bottom: 12px;">⏳</div>
-            <h3 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">Activation Pending</h3>
-            <p style="font-size: 13px; color: #475569; margin-bottom: 24px;">
+            <div style="font-size: 36px; margin-bottom: 12px;">⏳</div>
+            <h3 style="font-size: 22px; font-weight: 900; color: #0f172a; margin: 0 0 8px 0;">Activation Pending</h3>
+            <p style="font-size: 14px; color: #1e293b; margin-bottom: 24px; font-weight: 600;">
                 Your account has not yet been activated by your department coordinator.
             </p>
         </div>
@@ -565,11 +548,11 @@ elif user_status == "PENDING":
 elif user_status == "BLOCKED":
     col_e1, col_e2, col_e3 = st.columns([1, 2, 1])
     with col_e2:
-        render_html(f"""
+        render_html("""
         <div class="saas-card" style="text-align: center; padding: 36px 30px; border-top: 4px solid #ef4444;">
-            <div style="font-size: 32px; margin-bottom: 12px;">🛑</div>
-            <h3 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">Account Blocked</h3>
-            <p style="font-size: 13px; color: #475569; margin-bottom: 24px;">
+            <div style="font-size: 36px; margin-bottom: 12px;">🛑</div>
+            <h3 style="font-size: 22px; font-weight: 900; color: #0f172a; margin: 0 0 8px 0;">Account Blocked</h3>
+            <p style="font-size: 14px; color: #1e293b; margin-bottom: 24px; font-weight: 600;">
                 Your account has been blocked. Please contact the administrator.
             </p>
         </div>
@@ -586,27 +569,26 @@ user_name = user_record["name"]
 # 7. PROTECTED SIDEBAR NAVIGATION (STRICTLY ROLE-BOUND)
 # ==============================================================================
 with st.sidebar:
-    render_html(f"""
-    <div style="padding: 6px 0 16px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 16px;">
+    render_html("""
+    <div style="padding: 6px 0 16px 0; border-bottom: 1px solid #cbd5e1; margin-bottom: 16px;">
         <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="width: 32px; height: 32px; background: #1e3a8a; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 16px;">
+            <div style="width: 34px; height: 34px; background: #0f172a; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 18px;">
                 🎓
             </div>
             <div>
-                <div style="font-weight: 800; font-size: 15px; color: #0f172a; line-height: 1.2;">Placement Portal</div>
-                <div style="font-size: 11px; color: #64748b; font-weight: 500;">Prepare smarter. Perform better.</div>
+                <div style="font-weight: 900; font-size: 16px; color: #0f172a; line-height: 1.2;">Placement Portal</div>
+                <div style="font-size: 11px; color: #334155; font-weight: 600;">Prepare smarter. Perform better.</div>
             </div>
         </div>
     </div>
     """)
 
-    # Display Verified Role Badge (No user switching permitted)
-    badge_color = "#15803d" if user_role == "STUDENT" else "#1d4ed8" if user_role == "FACULTY" else "#b91c1c"
+    badge_color = "#166534" if user_role == "STUDENT" else "#1e40af" if user_role == "FACULTY" else "#991b1b"
     badge_bg = "#dcfce7" if user_role == "STUDENT" else "#dbeafe" if user_role == "FACULTY" else "#fee2e2"
 
     render_html(f"""
     <div style="margin-bottom: 16px;">
-        <span style="background: {badge_bg}; color: {badge_color}; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
+        <span style="background: {badge_bg}; color: {badge_color}; padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
             🛡️ {user_role} SPACE
         </span>
     </div>
@@ -631,12 +613,11 @@ with st.sidebar:
     st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
     st.markdown("---")
 
-    # Authenticated User Profile & Logout
     render_html(f"""
-    <div style="padding: 6px 0; font-size: 12px; color: #475569;">
-        <div style="font-weight: 800; color: #0f172a;">{user_name}</div>
-        <div style="font-size: 11px; color: #64748b; truncate;">{auth_email}</div>
-        <div style="font-size: 10px; color: #2563eb; font-weight: 700; margin-top: 3px;">{user_record.get('department', 'Engineering')}</div>
+    <div style="padding: 8px 0; font-size: 12px; color: #0f172a;">
+        <div style="font-weight: 900; font-size: 13px; color: #0f172a;">{user_name}</div>
+        <div style="font-size: 11px; color: #334155; font-weight: 600;">{auth_email}</div>
+        <div style="font-size: 11px; color: #1d4ed8; font-weight: 800; margin-top: 3px;">{user_record.get('department', 'Engineering')}</div>
     </div>
     """)
 
@@ -655,7 +636,7 @@ if user_role == "STUDENT":
         c1, c2, c3, c4 = st.columns(4)
         with c1:
             render_html(f"""
-            <div class="metric-container" style="border-left: 4px solid #1e3a8a;">
+            <div class="metric-container" style="border-left: 4px solid #0f172a;">
                 <div class="metric-label">Overall Score</div>
                 <div class="metric-value">{user_record.get('overall_score', 78)}%</div>
                 <div class="metric-subtext subtext-positive">+6% vs baseline</div>
@@ -663,7 +644,7 @@ if user_role == "STUDENT":
             """)
         with c2:
             render_html("""
-            <div class="metric-container" style="border-left: 4px solid #2563eb;">
+            <div class="metric-container" style="border-left: 4px solid #1d4ed8;">
                 <div class="metric-label">Coding & DSA</div>
                 <div class="metric-value">82%</div>
                 <div class="metric-subtext subtext-positive">+8% this month</div>
@@ -671,7 +652,7 @@ if user_role == "STUDENT":
             """)
         with c3:
             render_html("""
-            <div class="metric-container" style="border-left: 4px solid #f59e0b;">
+            <div class="metric-container" style="border-left: 4px solid #b45309;">
                 <div class="metric-label">Aptitude & Logic</div>
                 <div class="metric-value">74%</div>
                 <div class="metric-subtext subtext-warning">Target: 75% (Priority)</div>
@@ -679,7 +660,7 @@ if user_role == "STUDENT":
             """)
         with c4:
             render_html("""
-            <div class="metric-container" style="border-left: 4px solid #6366f1;">
+            <div class="metric-container" style="border-left: 4px solid #4338ca;">
                 <div class="metric-label">Mock Tests</div>
                 <div class="metric-value">76%</div>
                 <div class="metric-subtext subtext-neutral">1 completed • 1 scheduled</div>
@@ -688,24 +669,22 @@ if user_role == "STUDENT":
 
         st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
 
-        # Prominent Recommended Next Step
         render_html("""
         <div class="rec-banner">
             <div class="rec-badge">Recommended Next Step</div>
-            <h3 style="font-size: 18px; font-weight: 800; margin: 0 0 6px 0;">Focus on Quantitative Aptitude</h3>
-            <p style="font-size: 13px; color: #e0e7ff; margin: 0 0 14px 0; max-width: 750px; line-height: 1.5;">
+            <h3 style="font-size: 19px; font-weight: 900; margin: 0 0 6px 0; color: #ffffff;">Focus on Quantitative Aptitude</h3>
+            <p style="font-size: 14px; color: #e2e8f0; margin: 0 0 14px 0; max-width: 750px; line-height: 1.5; font-weight: 500;">
                 Your Quantitative Aptitude score is currently at <b>74%</b>, which is below your target benchmark of <b>75%</b>. 
                 Complete <i>Time & Work Speed Practice</i> before taking the next placement mock simulation.
             </p>
         </div>
         """)
 
-        # Performance Trend Chart & Roadmap
         col_chart, col_side = st.columns([1.3, 1])
         with col_chart:
             render_html("""
             <div class="saas-card">
-                <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Performance Trend</div>
+                <div style="font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 12px;">Performance Trend</div>
             """)
             df_trend = pd.DataFrame({
                 "Date": ["Aug 10", "Aug 18", "Aug 25", "Sep 01", "Sep 05"],
@@ -715,12 +694,12 @@ if user_role == "STUDENT":
             })
             fig_trend = px.line(
                 df_trend, x="Date", y=["Overall Score", "Coding & DSA", "Aptitude"],
-                markers=True, color_discrete_sequence=["#1e3a8a", "#2563eb", "#f59e0b"]
+                markers=True, color_discrete_sequence=["#0f172a", "#1d4ed8", "#b45309"]
             )
             fig_trend.update_layout(
                 margin=dict(l=10, r=10, t=10, b=10), height=260,
                 legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-                xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor="#f1f5f9", range=[50, 100]),
+                xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor="#e2e8f0", range=[50, 100]),
                 plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
             )
             st.plotly_chart(fig_trend, use_container_width=True, config={"displayModeBar": False})
@@ -730,13 +709,13 @@ if user_role == "STUDENT":
             render_html("""
             <div class="saas-card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <span style="font-size: 14px; font-weight: 700; color: #0f172a;">Placement Roadmap</span>
-                    <span style="font-size: 12px; font-weight: 700; color: #2563eb;">72% Overall</span>
+                    <span style="font-size: 15px; font-weight: 800; color: #0f172a;">Placement Roadmap</span>
+                    <span style="font-size: 13px; font-weight: 800; color: #1d4ed8;">72% Overall</span>
                 </div>
-                <div style="background: #f1f5f9; border-radius: 999px; height: 6px; margin-bottom: 12px; overflow: hidden;">
-                    <div style="background: #1e3a8a; width: 72%; height: 100%;"></div>
+                <div style="background: #e2e8f0; border-radius: 999px; height: 8px; margin-bottom: 14px; overflow: hidden;">
+                    <div style="background: #0f172a; width: 72%; height: 100%;"></div>
                 </div>
-                <div style="font-size: 12px; line-height: 1.8;">
+                <div style="font-size: 13px; line-height: 1.8; font-weight: 600; color: #1e293b;">
                     <div>✅ <b>Programming Fundamentals</b> — 100%</div>
                     <div>⏳ <b>Data Structures & Algorithms</b> — 82%</div>
                     <div>⚠️ <b>Quantitative Aptitude</b> — 74% (Needs Practice)</div>
@@ -764,7 +743,7 @@ if user_role == "STUDENT":
                 "Your Score": [82, 74, 72, 76, 80],
                 "Placement Target": [85, 75, 80, 75, 75]
             })
-            fig_bar = px.bar(df_comp, x="Skill", y=["Your Score", "Placement Target"], barmode="group", color_discrete_sequence=["#2563eb", "#cbd5e1"])
+            fig_bar = px.bar(df_comp, x="Skill", y=["Your Score", "Placement Target"], barmode="group", color_discrete_sequence=["#1d4ed8", "#94a3b8"])
             fig_bar.update_layout(template="plotly_white", height=300)
             st.plotly_chart(fig_bar, use_container_width=True)
 
@@ -773,7 +752,7 @@ if user_role == "STUDENT":
             fig_radar = go.Figure(go.Scatterpolar(
                 r=[82, 74, 72, 76, 80, 82],
                 theta=['Coding', 'Aptitude', 'Technical', 'Mock Tests', 'Verbal', 'Coding'],
-                fill='toself', fillcolor='rgba(37, 99, 235, 0.15)', line=dict(color='#2563eb', width=2)
+                fill='toself', fillcolor='rgba(29, 78, 216, 0.15)', line=dict(color='#1d4ed8', width=2)
             ))
             fig_radar.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])), height=300, margin=dict(l=30, r=30, t=20, b=20))
             st.plotly_chart(fig_radar, use_container_width=True)
@@ -788,10 +767,10 @@ if user_role == "STUDENT":
             with col_c1:
                 render_html("""
                 <div class="saas-card">
-                    <div style="font-size: 11px; font-weight: 700; color: #2563eb; text-transform: uppercase;">Algorithms</div>
-                    <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 4px 0 6px 0;">DSA Core Assessment</div>
-                    <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Arrays, two-pointers, hash tables, and string manipulation.</p>
-                    <div style="font-size: 11px; color: #475569; margin-bottom: 14px;">
+                    <div style="font-size: 11px; font-weight: 800; color: #1d4ed8; text-transform: uppercase;">Algorithms</div>
+                    <div style="font-size: 16px; font-weight: 900; color: #0f172a; margin: 4px 0 6px 0;">DSA Core Assessment</div>
+                    <p style="font-size: 13px; color: #334155; margin-bottom: 12px; font-weight: 500;">Arrays, two-pointers, hash tables, and string manipulation.</p>
+                    <div style="font-size: 12px; color: #0f172a; font-weight: 700; margin-bottom: 14px;">
                         • <b>3 Problems</b> • 45 Mins • <span class="badge badge-warning">Medium</span>
                     </div>
                 </div>
@@ -801,10 +780,10 @@ if user_role == "STUDENT":
             with col_c2:
                 render_html("""
                 <div class="saas-card">
-                    <div style="font-size: 11px; font-weight: 700; color: #2563eb; text-transform: uppercase;">Data Structures</div>
-                    <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 4px 0 6px 0;">Binary Trees & Recursion</div>
-                    <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Tree traversals, binary search trees, and DFS/BFS patterns.</p>
-                    <div style="font-size: 11px; color: #475569; margin-bottom: 14px;">
+                    <div style="font-size: 11px; font-weight: 800; color: #1d4ed8; text-transform: uppercase;">Data Structures</div>
+                    <div style="font-size: 16px; font-weight: 900; color: #0f172a; margin: 4px 0 6px 0;">Binary Trees & Recursion</div>
+                    <p style="font-size: 13px; color: #334155; margin-bottom: 12px; font-weight: 500;">Tree traversals, binary search trees, and DFS/BFS patterns.</p>
+                    <div style="font-size: 12px; color: #0f172a; font-weight: 700; margin-bottom: 14px;">
                         • <b>2 Problems</b> • 45 Mins • <span class="badge badge-danger">Hard</span>
                     </div>
                 </div>
@@ -814,10 +793,10 @@ if user_role == "STUDENT":
             with col_c3:
                 render_html("""
                 <div class="saas-card">
-                    <div style="font-size: 11px; font-weight: 700; color: #2563eb; text-transform: uppercase;">Fundamentals</div>
-                    <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 4px 0 6px 0;">Python & OOP Basics</div>
-                    <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Object-oriented principles, exception handling, and lambdas.</p>
-                    <div style="font-size: 11px; color: #475569; margin-bottom: 14px;">
+                    <div style="font-size: 11px; font-weight: 800; color: #1d4ed8; text-transform: uppercase;">Fundamentals</div>
+                    <div style="font-size: 16px; font-weight: 900; color: #0f172a; margin: 4px 0 6px 0;">Python & OOP Basics</div>
+                    <p style="font-size: 13px; color: #334155; margin-bottom: 12px; font-weight: 500;">Object-oriented principles, exception handling, and lambdas.</p>
+                    <div style="font-size: 12px; color: #0f172a; font-weight: 700; margin-bottom: 14px;">
                         • <b>4 Problems</b> • 30 Mins • <span class="badge badge-success">Easy</span>
                     </div>
                 </div>
@@ -849,18 +828,18 @@ if user_role == "STUDENT":
             with col_a1:
                 render_html("""
                 <div class="saas-card">
-                    <div style="font-size: 11px; font-weight: 700; color: #f59e0b; text-transform: uppercase;">Quantitative</div>
-                    <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 4px 0 6px 0;">Speed Math & Percentages</div>
-                    <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Time & work, ratios, and quick calculation tricks.</p>
+                    <div style="font-size: 11px; font-weight: 800; color: #b45309; text-transform: uppercase;">Quantitative</div>
+                    <div style="font-size: 16px; font-weight: 900; color: #0f172a; margin: 4px 0 6px 0;">Speed Math & Percentages</div>
+                    <p style="font-size: 13px; color: #334155; margin-bottom: 12px; font-weight: 500;">Time & work, ratios, and quick calculation tricks.</p>
                 </div>
                 """)
                 st.button("Start Quantitative Set", key="btn_q1", use_container_width=True, type="primary")
             with col_a2:
                 render_html("""
                 <div class="saas-card">
-                    <div style="font-size: 11px; font-weight: 700; color: #f59e0b; text-transform: uppercase;">Logical</div>
-                    <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 4px 0 6px 0;">Logical Deductions & Puzzles</div>
-                    <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Seating arrangements and syllogisms.</p>
+                    <div style="font-size: 11px; font-weight: 800; color: #b45309; text-transform: uppercase;">Logical</div>
+                    <div style="font-size: 16px; font-weight: 900; color: #0f172a; margin: 4px 0 6px 0;">Logical Deductions & Puzzles</div>
+                    <p style="font-size: 13px; color: #334155; margin-bottom: 12px; font-weight: 500;">Seating arrangements and syllogisms.</p>
                 </div>
                 """)
                 st.button("Start Logical Set", key="btn_l1", use_container_width=True)
@@ -871,8 +850,8 @@ if user_role == "STUDENT":
         render_html("""
         <div class="saas-card">
             <span class="badge badge-info">Tier-1 Corporate Simulation</span>
-            <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 6px 0 8px 0;">Placement Mock Simulation 2026</h3>
-            <p style="font-size: 13px; color: #475569; line-height: 1.5;">
+            <h3 style="font-size: 19px; font-weight: 900; color: #0f172a; margin: 6px 0 8px 0;">Placement Mock Simulation 2026</h3>
+            <p style="font-size: 14px; color: #334155; line-height: 1.5; font-weight: 500;">
                 Complete simulation covering Quantitative Math (15 Qs), Logical Reasoning (15 Qs), Verbal Ability (10 Qs), and Live Coding (2 Problems).
             </p>
         </div>
@@ -886,28 +865,28 @@ if user_role == "STUDENT":
             <div class="timeline-item">
                 <div class="step-number step-done">✓</div>
                 <div style="flex: 1;">
-                    <span style="font-weight: 800; font-size: 14px; color: #0f172a;">1. Programming Fundamentals</span>
+                    <span style="font-weight: 900; font-size: 15px; color: #0f172a;">1. Programming Fundamentals</span>
                     <span class="badge badge-success" style="float: right;">100% Completed</span>
                 </div>
             </div>
             <div class="timeline-item">
                 <div class="step-number step-active">2</div>
                 <div style="flex: 1;">
-                    <span style="font-weight: 800; font-size: 14px; color: #0f172a;">2. Data Structures & Algorithms</span>
+                    <span style="font-weight: 900; font-size: 15px; color: #0f172a;">2. Data Structures & Algorithms</span>
                     <span class="badge badge-info" style="float: right;">82% In Progress</span>
                 </div>
             </div>
             <div class="timeline-item">
-                <div class="step-number" style="background: #f59e0b; color: white;">3</div>
+                <div class="step-number" style="background: #b45309; color: white;">3</div>
                 <div style="flex: 1;">
-                    <span style="font-weight: 800; font-size: 14px; color: #0f172a;">3. Quantitative & Logical Aptitude</span>
+                    <span style="font-weight: 900; font-size: 15px; color: #0f172a;">3. Quantitative & Logical Aptitude</span>
                     <span class="badge badge-warning" style="float: right;">74% Needs Practice</span>
                 </div>
             </div>
             <div class="timeline-item">
                 <div class="step-number step-active">4</div>
                 <div style="flex: 1;">
-                    <span style="font-weight: 800; font-size: 14px; color: #0f172a;">4. Placement Mock Exams</span>
+                    <span style="font-weight: 900; font-size: 15px; color: #0f172a;">4. Placement Mock Exams</span>
                     <span class="badge badge-info" style="float: right;">76% In Progress</span>
                 </div>
             </div>
@@ -919,9 +898,9 @@ if user_role == "STUDENT":
         col_s1, col_s2 = st.columns(2)
         with col_s1:
             render_html("""
-            <div class="saas-card" style="border-top: 4px solid #10b981;">
-                <div style="font-size: 14px; font-weight: 800; color: #065f46; margin-bottom: 8px;">Identified Strengths</div>
-                <div style="font-size: 12px; line-height: 1.8; color: #334155;">
+            <div class="saas-card" style="border-top: 4px solid #059669;">
+                <div style="font-size: 15px; font-weight: 900; color: #065f46; margin-bottom: 8px;">Identified Strengths</div>
+                <div style="font-size: 13px; line-height: 1.8; color: #0f172a; font-weight: 600;">
                     <div>• <b>Coding & Problem Solving (82%)</b> — Fast implementation.</div>
                     <div>• <b>Verbal Ability (80%)</b> — Strong reading comprehension.</div>
                 </div>
@@ -929,9 +908,9 @@ if user_role == "STUDENT":
             """)
         with col_s2:
             render_html("""
-            <div class="saas-card" style="border-top: 4px solid #f59e0b;">
-                <div style="font-size: 14px; font-weight: 800; color: #92400e; margin-bottom: 8px;">Priority Weaknesses</div>
-                <div style="font-size: 12px; line-height: 1.8; color: #334155;">
+            <div class="saas-card" style="border-top: 4px solid #b45309;">
+                <div style="font-size: 15px; font-weight: 900; color: #92400e; margin-bottom: 8px;">Priority Weaknesses</div>
+                <div style="font-size: 13px; line-height: 1.8; color: #0f172a; font-weight: 600;">
                     <div>• <b>Quantitative Math (74%)</b> — Below the 75% cutoff benchmark.</div>
                     <div>• <b>Operating Systems Core (68%)</b> — Review memory paging.</div>
                 </div>
@@ -942,9 +921,9 @@ if user_role == "STUDENT":
         st.title("Student Profile")
         render_html(f"""
         <div class="saas-card">
-            <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">{user_name}</h3>
-            <div style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Roll No: {user_record.get('id', 'STU001')} • {auth_email}</div>
-            <div style="font-size: 13px; color: #334155; line-height: 1.8;">
+            <h3 style="font-size: 20px; font-weight: 900; color: #0f172a; margin: 0 0 6px 0;">{user_name}</h3>
+            <div style="font-size: 13px; color: #334155; font-weight: 700; margin-bottom: 14px;">Roll No: {user_record.get('id', 'STU001')} • {auth_email}</div>
+            <div style="font-size: 14px; color: #0f172a; line-height: 1.8; font-weight: 600;">
                 • <b>Department:</b> {user_record.get('department', 'Engineering')}<br>
                 • <b>Academic CGPA:</b> {user_record.get('cgpa', 8.5)} / 10.0<br>
                 • <b>Readiness Status:</b> <span class="badge badge-success">Placement Ready</span>
@@ -989,7 +968,7 @@ elif user_role == "FACULTY":
         s_sel = st.selectbox("Select Student", ["2022CSE101 - Rohan Verma", "2022CSE109 - Siddharth Gupta"])
         st.metric("Overall Score", "78%", "+6%")
         render_html("""
-        <div class="saas-card">
+        <div class="saas-card" style="font-size: 14px; font-weight: 700; color: #0f172a;">
             <b>Faculty Mentorship Note:</b> Strong algorithmic coding capability. Recommend focused practice in permutations.
         </div>
         """)
@@ -1001,7 +980,7 @@ elif user_role == "FACULTY":
             "Average Score": [78.4, 73.2, 69.8, 66.5, 64.1],
             "Placement Ready %": [84.0, 72.5, 65.0, 58.0, 52.0]
         })
-        fig = px.bar(df_dept_perf, x="Department", y=["Average Score", "Placement Ready %"], barmode="group", color_discrete_sequence=["#1e3a8a", "#2563eb"])
+        fig = px.bar(df_dept_perf, x="Department", y=["Average Score", "Placement Ready %"], barmode="group", color_discrete_sequence=["#0f172a", "#1d4ed8"])
         fig.update_layout(template="plotly_white")
         st.plotly_chart(fig, use_container_width=True)
 
@@ -1009,8 +988,8 @@ elif user_role == "FACULTY":
         st.title("Faculty Profile")
         render_html(f"""
         <div class="saas-card">
-            <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">{user_name}</h3>
-            <div style="font-size: 13px; color: #64748b;">{user_record.get('title', 'Placement Coordinator')} • {user_record.get('department', 'CSE')}</div>
+            <h3 style="font-size: 20px; font-weight: 900; color: #0f172a; margin: 0 0 6px 0;">{user_name}</h3>
+            <div style="font-size: 14px; color: #334155; font-weight: 700;">{user_record.get('title', 'Placement Coordinator')} • {user_record.get('department', 'CSE')}</div>
         </div>
         """)
 
