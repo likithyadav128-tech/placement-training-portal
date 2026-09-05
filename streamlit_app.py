@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 import time
 from datetime import datetime
 
@@ -13,27 +12,26 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for SaaS Theme
+# Custom Styling (Universal Dark/Light Mode Compatible)
 st.markdown("""
 <style>
-    .main { background-color: #f8fafc; }
-    .stMetric {
-        background-color: white;
-        padding: 16px;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-    }
     .metric-card {
-        background: white;
+        background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 18px;
+        border-radius: 10px;
+        padding: 16px;
         margin-bottom: 12px;
     }
-    .badge-success { background-color: #ecfdf5; color: #065f46; padding: 4px 10px; border-radius: 9999px; font-weight: 600; font-size: 11px; }
-    .badge-warning { background-color: #fffbeb; color: #92400e; padding: 4px 10px; border-radius: 9999px; font-weight: 600; font-size: 11px; }
-    .badge-danger { background-color: #fef2f2; color: #991b1b; padding: 4px 10px; border-radius: 9999px; font-weight: 600; font-size: 11px; }
+    .custom-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 12px;
+    }
+    .badge-success { background: #dcfce7; color: #15803d; }
+    .badge-warning { background: #fef3c7; color: #b45309; }
+    .badge-danger { background: #fee2e2; color: #b91c1c; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -58,7 +56,7 @@ if "audit_logs" not in st.session_state:
 
 # Sidebar - Role Selection & Navigation
 with st.sidebar:
-    st.markdown("### 🎓 Placement Portal")
+    st.markdown("## 🎓 Placement Training Portal")
     st.caption("College Institutional Training System")
     
     selected_role = st.selectbox(
@@ -87,7 +85,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.caption(f"Authenticated as **{selected_role}**")
-    if st.button("🚪 Logout", use_container_width=True):
+    if st.button("🚪 Switch Account / Logout", use_container_width=True):
         st.session_state.user_role = "STUDENT"
         st.rerun()
 
@@ -107,15 +105,7 @@ if selected_role == "STUDENT":
         c4.metric("Mock Tests", f"{st.session_state.student_scores['mock']}%", "1 completed")
         
         # Recommended Next Step Banner
-        st.markdown("""
-        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 20px; border-radius: 12px; margin-top: 15px; margin-bottom: 20px;">
-            <span style="color: #93c5fd; font-weight: 700; font-size: 11px; text-transform: uppercase;">✨ Recommended Next Step</span>
-            <h3 style="margin-top: 5px; margin-bottom: 5px; color: white;">Boost Quantitative Fundamentals</h3>
-            <p style="color: #cbd5e1; font-size: 13px; margin-bottom: 0;">
-                Your quantitative aptitude performance is at 74%, below your 75% target. Practice Time & Work and Percentages before attempting the next placement mock test.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.info("✨ **Recommended Next Step:** Your quantitative aptitude performance is at **74%**, below your **75% target**. Practice Time & Work and Percentages before attempting the next placement mock test.")
         
         col_l, col_r = st.columns(2)
         with col_l:
@@ -170,17 +160,17 @@ if selected_role == "STUDENT":
             st.markdown("### 💻 DSA Core Assessment")
             st.caption("Category: Algorithms • Medium • 45 Mins")
             st.markdown("Covers arrays, two-pointers, hash maps, and valid parentheses.")
-            st.info("Score: 85% (Passed)")
+            st.success("Score: 85% (Passed)")
         with a2:
             st.markdown("### 🧠 Quantitative Speed Test")
             st.caption("Category: Aptitude • Easy • 30 Mins")
             st.markdown("Speed math, time & work, and sequence logic.")
-            st.info("Score: 74% (Passed)")
+            st.success("Score: 74% (Passed)")
         with a3:
             st.markdown("### 🏆 Placement Mock 2026")
             st.caption("Category: Simulation • Hard • 60 Mins")
             st.markdown("Full mock test across Quantitative, Logical, and Live Coding.")
-            st.info("Score: 76% (Passed)")
+            st.success("Score: 76% (Passed)")
 
     elif menu == "Coding IDE":
         st.title("💻 Live Coding Assessment IDE")
@@ -305,6 +295,18 @@ elif selected_role == "FACULTY":
         ])
         st.dataframe(df_students, use_container_width=True)
 
+    elif menu == "Student Deep-Dive":
+        st.title("🔍 Student Deep-Dive Inspection")
+        st.markdown("### Rohan Verma (2022CSE101)")
+        st.caption("Department of CSE • Year 4 • Section A • CGPA: 8.8")
+        
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Coding Score", "82%")
+        c2.metric("Aptitude Score", "74%")
+        c3.metric("Mock Exam Score", "76%")
+        
+        st.markdown("**Faculty Note:** Strong in algorithmic coding and data structures. Recommend focused practice in speed math and permutations.")
+
     elif menu == "Cohort Analytics":
         st.title("Cohort Analytics & Benchmarks")
         df_dept_avg = pd.DataFrame({
@@ -315,6 +317,16 @@ elif selected_role == "FACULTY":
         fig = px.bar(df_dept_avg, x="Department", y=["Average Score", "Readiness Rate (%)"], barmode="group", title="Departmental Performance & Readiness")
         fig.update_layout(template="plotly_white")
         st.plotly_chart(fig, use_container_width=True)
+
+    elif menu == "Profile":
+        st.title("👤 Faculty Profile")
+        st.markdown("""
+        - **Name:** Prof. Arvind Sharma
+        - **Email:** prof.sharma@institution.edu
+        - **Employee ID:** FAC-CSE-101
+        - **Department:** Computer Science & Engineering
+        - **Designation:** Professor & Placement Coordinator
+        """)
 
 # ==========================================
 # MANAGEMENT ROLE VIEWS
@@ -340,6 +352,44 @@ elif selected_role == "MANAGEMENT":
             {"Department": "CIVIL", "Enrolled": 45, "Avg Score": "64.1%", "Placement Ready Rate": "52.0%", "Status": "Needs Focus"}
         ])
         st.dataframe(df_depts, use_container_width=True)
+
+    elif menu == "Student Management":
+        st.title("Student Management")
+        st.caption("Provision students, assign department cohorts, and manage active status")
+        df_s_mgmt = pd.DataFrame([
+            {"Student ID": "2022CSE101", "Name": "Rohan Verma", "Email": "student1@institution.edu", "Dept": "CSE", "Year": 4, "Status": "ACTIVE"},
+            {"Student ID": "2022ECE102", "Name": "Ananya Iyer", "Email": "student2@institution.edu", "Dept": "ECE", "Year": 4, "Status": "ACTIVE"},
+            {"Student ID": "2022MECH103", "Name": "Vikram Singh", "Email": "student3@institution.edu", "Dept": "MECH", "Year": 4, "Status": "ACTIVE"},
+            {"Student ID": "2022CSE109", "Name": "Siddharth Gupta", "Email": "student9@institution.edu", "Dept": "CSE", "Year": 4, "Status": "ACTIVE"},
+        ])
+        st.dataframe(df_s_mgmt, use_container_width=True)
+        
+        with st.expander("➕ Provision New Student"):
+            ns_name = st.text_input("Full Name")
+            ns_email = st.text_input("Institutional Email")
+            ns_dept = st.selectbox("Department", ["CSE", "ECE", "EEE", "MECH", "CIVIL"], key="ns_dept")
+            if st.button("Provision Student"):
+                st.success(f"Student '{ns_name}' successfully provisioned!")
+
+    elif menu == "Faculty Management":
+        st.title("Faculty Management")
+        st.caption("Manage faculty leads and department appointments")
+        df_f_mgmt = pd.DataFrame([
+            {"Employee ID": "FAC-CSE-101", "Name": "Prof. Arvind Sharma", "Email": "prof.sharma@institution.edu", "Dept": "CSE", "Designation": "Professor & Coordinator", "Status": "ACTIVE"},
+            {"Employee ID": "FAC-ECE-202", "Name": "Dr. Neha Patel", "Email": "dr.patel@institution.edu", "Dept": "ECE", "Designation": "Associate Professor", "Status": "ACTIVE"}
+        ])
+        st.dataframe(df_f_mgmt, use_container_width=True)
+
+    elif menu == "Assessment Authoring":
+        st.title("Assessment Authoring & Configuration")
+        with st.expander("➕ Create New Assessment", expanded=True):
+            st.text_input("Assessment Title", "Graph Traversal & BFS/DFS")
+            st.selectbox("Type", ["CODING", "APTITUDE", "MOCK"], key="ass_type")
+            st.selectbox("Difficulty", ["Easy", "Medium", "Hard"], key="ass_diff")
+            st.number_input("Duration (Minutes)", 15, 180, 45)
+            st.number_input("Passing Score (%)", 40, 100, 60)
+            if st.button("Publish Assessment to Students"):
+                st.success("Assessment published successfully!")
 
     elif menu == "Permission Matrix (RBAC)":
         st.title("🛡️ Granular RBAC & Permission Matrix")
