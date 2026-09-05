@@ -2,24 +2,26 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
+  Calendar,
+  MessageSquare,
+  Folder,
+  GraduationCap,
   TrendingUp,
   BookOpen,
-  CheckSquare,
+  Award,
   Map,
   Lightbulb,
   User,
   LogOut,
   Users,
-  GraduationCap,
-  FileCheck,
-  Award,
   ShieldCheck,
   FileBarChart,
   History,
   Settings,
+  HelpCircle,
   ChevronLeft,
   ChevronRight,
-  Sparkles
+  Layers
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuth } from '../../context/AuthContext';
@@ -40,36 +42,30 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse })
 
   if (!user) return null;
 
-  // Role-specific navigation items strictly adhering to specification
+  // Navigation items styled to match the screenshot exactly
   const studentNav = [
+    { name: 'My schedule', path: '/student/mock-tests', icon: Calendar },
     { name: 'Dashboard', path: '/student/dashboard', icon: LayoutDashboard },
-    { name: 'My Performance', path: '/student/performance', icon: TrendingUp },
-    { name: 'Assessments', path: '/student/assessments', icon: BookOpen },
-    { name: 'Mock Tests', path: '/student/mock-tests', icon: Award },
-    { name: 'My Roadmap', path: '/student/roadmap', icon: Map },
-    { name: 'Analysis & Suggestions', path: '/student/analysis', icon: Lightbulb },
-    { name: 'Profile', path: '/student/profile', icon: User },
+    { name: 'Message', path: '/student/analysis', icon: MessageSquare },
+    { name: 'Projects', path: '/student/assessments', icon: Folder },
+    { name: 'Grades', path: '/student/performance', icon: GraduationCap },
   ];
 
   const facultyNav = [
     { name: 'Dashboard', path: '/faculty/dashboard', icon: LayoutDashboard },
     { name: 'Students', path: '/faculty/students', icon: Users },
-    { name: 'Assessments', path: '/student/assessments', icon: BookOpen },
+    { name: 'Assessments', path: '/student/assessments', icon: Folder },
     { name: 'Analytics', path: '/faculty/analytics', icon: TrendingUp },
-    { name: 'Profile', path: '/student/profile', icon: User },
   ];
 
   const managementNav = [
     { name: 'Dashboard', path: '/management/dashboard', icon: LayoutDashboard },
     { name: 'Students', path: '/management/students', icon: GraduationCap },
     { name: 'Faculty', path: '/management/faculty', icon: Users },
-    { name: 'Assessments', path: '/management/assessments', icon: BookOpen },
-    { name: 'Mock Tests', path: '/management/mock-tests', icon: Award },
-    { name: 'Roadmaps', path: '/management/roadmaps', icon: Map },
+    { name: 'Assessments', path: '/management/assessments', icon: Folder },
     { name: 'Permissions', path: '/management/permissions', icon: ShieldCheck },
     { name: 'Reports', path: '/management/reports', icon: FileBarChart },
     { name: 'Audit Logs', path: '/management/audit-logs', icon: History },
-    { name: 'Settings', path: '/management/settings', icon: Settings },
   ];
 
   const navItems = user.role === 'STUDENT' ? studentNav : user.role === 'FACULTY' ? facultyNav : managementNav;
@@ -77,75 +73,103 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse })
   return (
     <aside
       className={clsx(
-        'hidden md:flex flex-col bg-white border-r border-slate-200/80 transition-all duration-300 z-30 select-none',
-        collapsed ? 'w-20' : 'w-64'
+        'hidden md:flex flex-col bg-white border-r border-slate-100 transition-all duration-300 z-30 select-none py-5 px-3.5 justify-between',
+        collapsed ? 'w-20' : 'w-60'
       )}
     >
-      {/* Brand Header */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100">
-        {!collapsed && (
-          <div className="flex items-center gap-2.5 overflow-hidden">
-            <div className="h-9 w-9 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-base shadow-sm">
-              <Sparkles className="h-5 w-5 text-brand-300" />
-            </div>
-            <div className="flex flex-col leading-none">
-              <span className="font-bold text-sm text-slate-900 tracking-tight">Placement Portal</span>
-              <span className="text-[10px] text-slate-400 font-medium mt-0.5 uppercase tracking-wider">
-                {user.role} Space
+      <div>
+        {/* Logo / Brand Header */}
+        <div className="flex items-center justify-between mb-8 px-2">
+          {!collapsed ? (
+            <div className="flex items-center gap-2.5">
+              <div className="h-8 w-8 rounded-xl bg-purple-600 text-white flex items-center justify-center font-black shadow-sm">
+                <Layers className="h-5 w-5 text-white" />
+              </div>
+              <span className="font-extrabold text-lg text-slate-800 tracking-tight font-sans">
+                Robotech
               </span>
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="mx-auto h-8 w-8 rounded-xl bg-purple-600 text-white flex items-center justify-center font-black">
+              <Layers className="h-5 w-5 text-white" />
+            </div>
+          )}
 
-        {collapsed && (
-          <div className="mx-auto h-9 w-9 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-base">
-            <Sparkles className="h-5 w-5 text-brand-300" />
-          </div>
-        )}
+          <button
+            onClick={onToggleCollapse}
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors"
+            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          </button>
+        </div>
 
-        <button
-          onClick={onToggleCollapse}
-          className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-        </button>
+        {/* Primary Navigation Links */}
+        <div className="space-y-1.5">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) =>
+                  clsx(
+                    'flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-[13px] font-medium transition-all group',
+                    isActive
+                      ? 'bg-[#EAE5F8] text-[#7C3AED] font-semibold shadow-xs'
+                      : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                  )
+                }
+                title={collapsed ? item.name : undefined}
+              >
+                <Icon className="h-4 w-4 flex-shrink-0" />
+                {!collapsed && <span>{item.name}</span>}
+              </NavLink>
+            );
+          })}
+        </div>
+
+        {/* Divider */}
+        <div className="my-5 border-t border-slate-100"></div>
+
+        {/* Secondary Navigation (Settings & Logout) */}
+        <div className="space-y-1.5">
+          <NavLink
+            to={user.role === 'MANAGEMENT' ? '/management/settings' : '/student/profile'}
+            className={({ isActive }) =>
+              clsx(
+                'flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-[13px] font-medium transition-all group',
+                isActive
+                  ? 'bg-[#EAE5F8] text-[#7C3AED] font-semibold shadow-xs'
+                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+              )
+            }
+            title={collapsed ? 'Settings' : undefined}
+          >
+            <Settings className="h-4 w-4 flex-shrink-0" />
+            {!collapsed && <span>Settings</span>}
+          </NavLink>
+
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-[13px] font-medium text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+            title={collapsed ? 'Log out' : undefined}
+          >
+            <LogOut className="h-4 w-4 flex-shrink-0" />
+            {!collapsed && <span>Log out</span>}
+          </button>
+        </div>
       </div>
 
-      {/* Navigation Links */}
-      <div className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) =>
-                clsx(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group',
-                  isActive
-                    ? 'bg-slate-900 text-white shadow-sm font-semibold'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                )
-              }
-              title={collapsed ? item.name : undefined}
-            >
-              <Icon className="h-5 w-5 flex-shrink-0" />
-              {!collapsed && <span className="truncate">{item.name}</span>}
-            </NavLink>
-          );
-        })}
-      </div>
-
-      {/* Footer Profile & Logout */}
-      <div className="p-3 border-t border-slate-100 space-y-1">
+      {/* Bottom Pinned Support */}
+      <div className="pt-4 px-2">
         <button
-          onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-colors"
-          title={collapsed ? 'Logout' : undefined}
+          onClick={() => alert('Support & Help Desk: support@institution.edu')}
+          className="flex items-center gap-2.5 text-xs font-medium text-slate-400 hover:text-purple-600 transition-colors"
+          title={collapsed ? 'Support' : undefined}
         >
-          <LogOut className="h-5 w-5 flex-shrink-0" />
-          {!collapsed && <span>Logout</span>}
+          <HelpCircle className="h-4 w-4 flex-shrink-0" />
+          {!collapsed && <span>Support</span>}
         </button>
       </div>
     </aside>

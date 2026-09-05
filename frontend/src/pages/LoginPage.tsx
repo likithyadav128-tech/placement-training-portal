@@ -1,43 +1,44 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Sparkles, Shield, User, GraduationCap, Users, ShieldAlert, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Sparkles, Shield, User, GraduationCap, Users, ArrowRight, Layers } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { Button } from '../components/ui/Button';
-import { Card, CardContent } from '../components/ui/Card';
 import { Alert } from '../components/ui/Alert';
 
 export const LoginPage: React.FC = () => {
   const { loginAsDemo, loginWithMicrosoft, error, clearError } = useAuth();
   const [loadingEmail, setLoadingEmail] = useState<string | null>(null);
   const navigate = useNavigate();
-  const location = useLocation();
 
   const demoAccounts = [
     {
-      role: 'STUDENT (Tier 1 High Performer)',
+      role: 'STUDENT',
       email: 'student1@institution.edu',
       name: 'Rohan Verma (CSE, 4th Year)',
+      desc: 'Placement Ready • Tier 1 High Performer',
       icon: GraduationCap,
-      badge: 'bg-sky-100 text-sky-800',
+      badge: 'bg-purple-100 text-purple-800',
     },
     {
-      role: 'STUDENT (Needs Support)',
+      role: 'STUDENT',
       email: 'student9@institution.edu',
       name: 'Siddharth Gupta (CSE, 4th Year)',
+      desc: 'Needs Support in Quantitative Math',
       icon: GraduationCap,
       badge: 'bg-amber-100 text-amber-800',
     },
     {
-      role: 'FACULTY COORDINATOR',
+      role: 'FACULTY',
       email: 'prof.sharma@institution.edu',
-      name: 'Prof. Arvind Sharma (CSE Placement Lead)',
+      name: 'Prof. Arvind Sharma',
+      desc: 'CSE Department Placement Lead & Mentor',
       icon: Users,
-      badge: 'bg-indigo-100 text-indigo-800',
+      badge: 'bg-cyan-100 text-cyan-800',
     },
     {
-      role: 'DEAN / MANAGEMENT ADMIN',
+      role: 'MANAGEMENT',
       email: 'admin@institution.edu',
-      name: 'Dr. Rajeshwar Rao (Dean Placements)',
+      name: 'Dr. Rajeshwar Rao',
+      desc: 'Dean of Placements & System Governance',
       icon: Shield,
       badge: 'bg-rose-100 text-rose-800',
     },
@@ -63,98 +64,84 @@ export const LoginPage: React.FC = () => {
   };
 
   const handleMicrosoftLogin = () => {
-    // Standard OAuth2 redirect simulation for Entra ID
-    alert('Connecting to Microsoft Entra ID OpenID Connect endpoint...\n(Use the institutional fast login cards below to test any role instantly)');
+    alert('Connecting to Microsoft Entra ID OpenID Connect...\n(Use the institutional fast login options below to explore all features instantly)');
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-slate-50">
-      {/* LEFT SIDE: Brand & Value Proposition */}
-      <div className="lg:w-1/2 bg-slate-900 text-white p-8 lg:p-16 flex flex-col justify-between relative overflow-hidden">
-        {/* Subtle decorative background glow */}
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-brand-600/20 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div className="min-h-screen bg-[#ECE7F6] relative overflow-hidden flex items-center justify-center p-4 selection:bg-purple-200">
+      {/* Pastel background blobs matching UI aesthetic */}
+      <div className="absolute top-0 right-0 w-[450px] h-[380px] bg-[#FED7AA]/40 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
+      <div className="absolute bottom-0 left-0 w-[550px] h-[420px] bg-[#D8B4FE]/35 rounded-full blur-3xl pointer-events-none -ml-28 -mb-28"></div>
 
-        <div className="relative z-10">
-          <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-lg">
-              <Sparkles className="h-6 w-6 text-brand-300" />
+      <div className="w-full max-w-4xl bg-white/95 backdrop-blur-md rounded-[2.5rem] shadow-2xl border border-white/80 overflow-hidden flex flex-col md:flex-row relative z-10">
+        {/* Left Side: Gradient Brand Panel */}
+        <div className="md:w-5/12 bg-gradient-to-br from-[#8E7CC3] via-[#7B69B3] to-[#6856A1] text-white p-8 md:p-10 flex flex-col justify-between relative overflow-hidden">
+          <div className="relative z-10">
+            <div className="flex items-center gap-2.5">
+              <div className="h-9 w-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center font-bold">
+                <Layers className="h-5 w-5 text-white" />
+              </div>
+              <span className="text-lg font-black tracking-tight font-sans">Robotech</span>
             </div>
-            <span className="text-xl font-bold tracking-tight">Placement Training Portal</span>
+
+            <div className="mt-12 space-y-3">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-purple-200">
+                University Placement Portal
+              </span>
+              <h2 className="text-2xl font-black leading-tight text-white">
+                Empowering every student to achieve their dream career.
+              </h2>
+              <p className="text-xs text-purple-100/80 leading-relaxed pt-1">
+                Real-time coding IDE, aptitude benchmarks, mentorship workflows, and automated governance.
+              </p>
+            </div>
           </div>
 
-          <div className="mt-16 lg:mt-24 max-w-lg">
-            <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight text-white">
-              Prepare smarter. <br />
-              Perform better. <br />
-              <span className="text-brand-300">Get placement ready.</span>
-            </h1>
-            <p className="mt-4 text-slate-300 text-sm lg:text-base leading-relaxed">
-              An institutional platform engineered for universities. Real-time coding assessments,
-              data-driven aptitude analysis, personalized roadmaps, and administrative governance.
-            </p>
+          <div className="relative z-10 mt-8 pt-6 border-t border-white/10 flex items-center justify-between text-[11px] text-purple-200 font-medium">
+            <span>Enterprise Edition</span>
+            <span>Role-Based RBAC</span>
           </div>
         </div>
 
-        <div className="relative z-10 mt-12 pt-8 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-          <span>Enterprise University Edition</span>
-          <span>Role-Based Access Control</span>
-        </div>
-      </div>
-
-      {/* RIGHT SIDE: Authentication Card */}
-      <div className="lg:w-1/2 p-6 lg:p-16 flex flex-col justify-center items-center">
-        <div className="w-full max-w-md space-y-6">
-          <div className="text-center lg:text-left">
-            <h2 className="text-2xl font-bold text-slate-900">Institutional Sign In</h2>
-            <p className="text-xs text-slate-500 mt-1">
-              Select your authentication method or institutional role.
-            </p>
-          </div>
-
-          {error && (
-            <Alert variant="error" title="Authentication Error">
-              {error}
-            </Alert>
-          )}
-
-          {/* Microsoft Login Card */}
-          <Card className="border-slate-300 shadow-sm">
-            <CardContent className="p-6 space-y-4">
-              <button
-                onClick={handleMicrosoftLogin}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all shadow-sm"
-              >
-                <svg className="h-5 w-5" viewBox="0 0 23 23">
-                  <path fill="#f35325" d="M1 1h10v10H1z" />
-                  <path fill="#81bc06" d="M12 1h10v10H12z" />
-                  <path fill="#05a6f0" d="M1 12h10v10H1z" />
-                  <path fill="#ffba08" d="M12 12h10v10H12z" />
-                </svg>
-                Continue with Microsoft
-              </button>
-
-              <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400 text-center">
-                <Shield className="h-3.5 w-3.5 text-emerald-600" />
-                <span>Secure institutional authentication (Entra ID / OAuth 2.0)</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Institutional Fast-Login Test Switcher */}
-          <div className="space-y-3 pt-2">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200"></div>
-              </div>
-              <div className="relative flex justify-center text-[11px] uppercase">
-                <span className="bg-slate-50 px-3 font-semibold text-slate-500 tracking-wider">
-                  Or Instant Demo Role Access
-                </span>
-              </div>
+        {/* Right Side: Fast Login */}
+        <div className="md:w-7/12 p-8 md:p-10 flex flex-col justify-center bg-[#F8F9FD]">
+          <div className="max-w-md mx-auto w-full space-y-5">
+            <div>
+              <h2 className="text-xl font-black text-slate-800">Institutional Sign In</h2>
+              <p className="text-xs text-slate-400 font-medium mt-0.5">
+                Select your role or sign in with university credentials.
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-2.5">
+            {error && (
+              <Alert variant="error" title="Authentication Error">
+                {error}
+              </Alert>
+            )}
+
+            {/* Microsoft Single Sign-On Button */}
+            <button
+              onClick={handleMicrosoftLogin}
+              className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-xs font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-xs transition-all"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 23 23">
+                <path fill="#f35325" d="M1 1h10v10H1z" />
+                <path fill="#81bc06" d="M12 1h10v10H12z" />
+                <path fill="#05a6f0" d="M1 12h10v10H1z" />
+                <path fill="#ffba08" d="M12 12h10v10H12z" />
+              </svg>
+              <span>Continue with Microsoft Entra ID</span>
+            </button>
+
+            <div className="relative flex items-center justify-center">
+              <div className="w-full border-t border-slate-200"></div>
+              <span className="absolute bg-[#F8F9FD] px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                Instant Role Access
+              </span>
+            </div>
+
+            {/* Demo Fast Login Switcher Cards */}
+            <div className="space-y-2">
               {demoAccounts.map((acc) => {
                 const Icon = acc.icon;
                 const isThisLoading = loadingEmail === acc.email;
@@ -163,30 +150,30 @@ export const LoginPage: React.FC = () => {
                     key={acc.email}
                     onClick={() => handleDemoLogin(acc.email)}
                     disabled={!!loadingEmail}
-                    className="flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-xl hover:border-slate-900 hover:shadow-card-hover transition-all text-left group"
+                    className="w-full flex items-center justify-between p-3 bg-white border border-slate-200/80 rounded-2xl hover:border-purple-300 hover:shadow-soft transition-all text-left group"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="h-9 w-9 rounded-lg bg-slate-100 group-hover:bg-slate-900 group-hover:text-white flex items-center justify-center text-slate-700 transition-colors flex-shrink-0">
+                      <div className="h-9 w-9 rounded-xl bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white flex items-center justify-center transition-colors flex-shrink-0">
                         <Icon className="h-4 w-4" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-xs text-slate-900 truncate">
+                          <span className="font-bold text-xs text-slate-800 truncate">
                             {acc.name}
                           </span>
-                          <span className={`text-[10px] px-1.5 py-0.2 rounded font-medium ${acc.badge}`}>
-                            {acc.role.split(' ')[0]}
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-bold uppercase ${acc.badge}`}>
+                            {acc.role}
                           </span>
                         </div>
-                        <span className="text-[11px] text-slate-400 truncate block">
-                          {acc.email}
+                        <span className="text-[10px] text-slate-400 truncate block mt-0.5">
+                          {acc.desc}
                         </span>
                       </div>
                     </div>
 
-                    <div className="text-slate-400 group-hover:text-slate-900 transition-colors ml-2">
+                    <div className="text-slate-300 group-hover:text-purple-600 transition-colors ml-2 flex-shrink-0">
                       {isThisLoading ? (
-                        <div className="h-4 w-4 border-2 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="h-4 w-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
                       ) : (
                         <ArrowRight className="h-4 w-4" />
                       )}
