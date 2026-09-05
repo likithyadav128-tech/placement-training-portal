@@ -5,9 +5,10 @@ import plotly.express as px
 import time
 import textwrap
 from datetime import datetime
+from typing import Optional, Dict, Any
 
 # ==============================================================================
-# 1. PAGE CONFIGURATION
+# 1. STREAMLIT PAGE CONFIGURATION
 # ==============================================================================
 st.set_page_config(
     page_title="Placement Training Portal",
@@ -16,14 +17,13 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ==============================================================================
-# 2. DESIGN SYSTEM & REUSABLE UI HELPERS
-# ==============================================================================
 def render_html(html_str: str):
-    """Safely render dedented HTML strings in Streamlit."""
+    """Safely render dedented HTML in Streamlit without markdown code block triggers."""
     st.markdown(textwrap.dedent(html_str).strip(), unsafe_allow_html=True)
 
-# Enterprise SaaS CSS Theme
+# ==============================================================================
+# 2. GLOBAL THEME & STYLES (Professional Enterprise Palette)
+# ==============================================================================
 render_html("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -36,7 +36,7 @@ render_html("""
         background-color: #f8fafc;
     }
 
-    /* Professional Metric Cards */
+    /* Professional Card Containers */
     .saas-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
@@ -116,7 +116,32 @@ render_html("""
     .badge-danger { background: #fee2e2; color: #b91c1c; }
     .badge-info { background: #dbeafe; color: #1d4ed8; }
 
-    /* Activity Row */
+    /* Microsoft Login Button */
+    .ms-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+        height: 48px;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        color: #1e293b;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+    .ms-btn:hover {
+        background: #f8fafc;
+        border-color: #94a3b8;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+
+    /* Activity & Timeline */
     .activity-item {
         display: flex;
         align-items: center;
@@ -128,7 +153,6 @@ render_html("""
         border-bottom: none;
     }
 
-    /* Timeline Step */
     .timeline-item {
         display: flex;
         align-items: flex-start;
@@ -153,50 +177,416 @@ render_html("""
         justify-content: center;
         flex-shrink: 0;
     }
-
-    .step-active {
-        background: #2563eb;
-        color: #ffffff;
-    }
-
-    .step-done {
-        background: #10b981;
-        color: #ffffff;
-    }
+    .step-active { background: #2563eb; color: #ffffff; }
+    .step-done { background: #10b981; color: #ffffff; }
 </style>
 """)
 
 # ==============================================================================
-# 3. STATE INITIALIZATION & DATA LAYER
+# 3. DATABASE USER REGISTRY & REPOSITORY
 # ==============================================================================
-if "user_role" not in st.session_state:
-    st.session_state.user_role = "STUDENT"
-
-if "student_scores" not in st.session_state:
-    st.session_state.student_scores = {
-        "overall": 78,
-        "coding": 82,
-        "aptitude": 74,
-        "mock": 76,
-        "technical": 72,
-        "verbal": 80
+# Authoritative database of institutional users
+# Real Microsoft authentication verifies identity; the database determines role and authorization.
+INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
+    "likith@college.edu": {
+        "id": "STU001",
+        "name": "Likith Yadav",
+        "email": "likith@college.edu",
+        "role": "STUDENT",
+        "status": "ACTIVE",
+        "department": "Computer Science & Engineering",
+        "year": 4,
+        "section": "A",
+        "cgpa": 8.9,
+        "overall_score": 82
+    },
+    "rohan.verma@institution.edu": {
+        "id": "STU002",
+        "name": "Rohan Verma",
+        "email": "rohan.verma@institution.edu",
+        "role": "STUDENT",
+        "status": "ACTIVE",
+        "department": "Computer Science & Engineering",
+        "year": 4,
+        "section": "A",
+        "cgpa": 8.8,
+        "overall_score": 78
+    },
+    "student1@institution.edu": {
+        "id": "STU003",
+        "name": "Rohan Verma",
+        "email": "student1@institution.edu",
+        "role": "STUDENT",
+        "status": "ACTIVE",
+        "department": "Computer Science & Engineering",
+        "year": 4,
+        "section": "A",
+        "cgpa": 8.8,
+        "overall_score": 78
+    },
+    "ananya.iyer@institution.edu": {
+        "id": "STU004",
+        "name": "Ananya Iyer",
+        "email": "ananya.iyer@institution.edu",
+        "role": "STUDENT",
+        "status": "ACTIVE",
+        "department": "Electronics & Communication",
+        "year": 4,
+        "section": "B",
+        "cgpa": 8.5,
+        "overall_score": 74
+    },
+    "siddharth.gupta@institution.edu": {
+        "id": "STU005",
+        "name": "Siddharth Gupta",
+        "email": "siddharth.gupta@institution.edu",
+        "role": "STUDENT",
+        "status": "ACTIVE",
+        "department": "Computer Science & Engineering",
+        "year": 4,
+        "section": "A",
+        "cgpa": 7.2,
+        "overall_score": 58
+    },
+    "inactive.student@institution.edu": {
+        "id": "STU006",
+        "name": "Karan Malhotra",
+        "email": "inactive.student@institution.edu",
+        "role": "STUDENT",
+        "status": "INACTIVE",
+        "department": "Mechanical Engineering",
+        "year": 4,
+        "section": "B",
+        "cgpa": 6.8,
+        "overall_score": 50
+    },
+    "blocked.student@institution.edu": {
+        "id": "STU007",
+        "name": "Abhishek Roy",
+        "email": "blocked.student@institution.edu",
+        "role": "STUDENT",
+        "status": "BLOCKED",
+        "department": "Civil Engineering",
+        "year": 4,
+        "section": "A",
+        "cgpa": 6.5,
+        "overall_score": 45
+    },
+    "pending.student@institution.edu": {
+        "id": "STU008",
+        "name": "Sneha Sen",
+        "email": "pending.student@institution.edu",
+        "role": "STUDENT",
+        "status": "PENDING",
+        "department": "Electrical & Electronics",
+        "year": 4,
+        "section": "A",
+        "cgpa": 7.9,
+        "overall_score": 62
+    },
+    "faculty@college.edu": {
+        "id": "FAC101",
+        "name": "Prof. Arvind Sharma",
+        "email": "faculty@college.edu",
+        "role": "FACULTY",
+        "status": "ACTIVE",
+        "department": "Computer Science & Engineering",
+        "title": "Professor & Placement Coordinator"
+    },
+    "prof.sharma@institution.edu": {
+        "id": "FAC102",
+        "name": "Prof. Arvind Sharma",
+        "email": "prof.sharma@institution.edu",
+        "role": "FACULTY",
+        "status": "ACTIVE",
+        "department": "Computer Science & Engineering",
+        "title": "Professor & Placement Coordinator"
+    },
+    "dr.patel@institution.edu": {
+        "id": "FAC103",
+        "name": "Dr. Neha Patel",
+        "email": "dr.patel@institution.edu",
+        "role": "FACULTY",
+        "status": "ACTIVE",
+        "department": "Electronics & Communication",
+        "title": "Associate Professor"
+    },
+    "admin@college.edu": {
+        "id": "MGT001",
+        "name": "Dr. Rajeshwar Rao",
+        "email": "admin@college.edu",
+        "role": "MANAGEMENT",
+        "status": "ACTIVE",
+        "department": "Institutional Governance",
+        "title": "Dean of Placements & Training"
+    },
+    "admin@institution.edu": {
+        "id": "MGT002",
+        "name": "Dr. Rajeshwar Rao",
+        "email": "admin@institution.edu",
+        "role": "MANAGEMENT",
+        "status": "ACTIVE",
+        "department": "Institutional Governance",
+        "title": "Dean of Placements & Training"
     }
+}
 
-if "active_student_view" not in st.session_state:
-    st.session_state.active_student_view = "2022CSE101"
+def lookup_user_in_database(email: Optional[str]) -> Optional[Dict[str, Any]]:
+    """Look up authenticated email in database. Role is NEVER user-selected."""
+    if not email:
+        return None
+    return INSTITUTIONAL_USERS_DB.get(email.strip().lower())
 
+# Session State & Audit Logs
 if "audit_logs" not in st.session_state:
     st.session_state.audit_logs = [
-        {"timestamp": "2026-09-05 10:30:15", "user": "admin@institution.edu", "role": "MANAGEMENT", "action": "INITIALIZE_SYSTEM", "target": "SYSTEM #1", "details": "Initialized portal placement readiness configuration"},
-        {"timestamp": "2026-09-05 11:15:22", "user": "admin@institution.edu", "role": "MANAGEMENT", "action": "CREATE_ASSESSMENT", "target": "ASSESSMENT #1", "details": "Published DSA Core Assessment (Medium, 45 Mins)"},
-        {"timestamp": "2026-09-05 11:45:00", "user": "admin@institution.edu", "role": "MANAGEMENT", "action": "GRANT_PERMISSION", "target": "Prof. Arvind Sharma", "details": "Granted MANAGE_ASSESSMENTS override to Faculty Coordinator"}
+        {"timestamp": "2026-09-05 10:30:15", "user": "admin@college.edu", "role": "MANAGEMENT", "action": "INITIALIZE_SYSTEM", "target": "SYSTEM #1", "details": "Configured Microsoft Entra ID OpenID Connect Authentication"},
+        {"timestamp": "2026-09-05 11:15:22", "user": "admin@college.edu", "role": "MANAGEMENT", "action": "CREATE_ASSESSMENT", "target": "ASSESSMENT #1", "details": "Published DSA Core Assessment"},
+        {"timestamp": "2026-09-05 11:45:00", "user": "admin@college.edu", "role": "MANAGEMENT", "action": "GRANT_PERMISSION", "target": "faculty@college.edu", "details": "Granted MANAGE_ASSESSMENTS override to Faculty Lead"}
     ]
 
 # ==============================================================================
-# 4. SIDEBAR NAVIGATION
+# 4. AUTHENTICATION ENGINE (NATIVE STREAMLIT AUTH & ENTRA ID)
+# ==============================================================================
+def get_authenticated_identity() -> Optional[Dict[str, Any]]:
+    """Retrieve identity from Streamlit's native st.user or session state."""
+    # 1. Check Streamlit native st.user (Streamlit >= 1.42.0)
+    try:
+        if hasattr(st, "user") and st.user and getattr(st.user, "is_logged_in", False):
+            return {
+                "email": getattr(st.user, "email", None) or getattr(st.user, "sub", None),
+                "name": getattr(st.user, "name", None) or "Authenticated User"
+            }
+    except Exception:
+        pass
+
+    # 2. Check session state simulated login (for development when Azure Entra secrets not yet configured locally)
+    if "authenticated_user_email" in st.session_state and st.session_state.authenticated_user_email:
+        return {
+            "email": st.session_state.authenticated_user_email,
+            "name": st.session_state.get("authenticated_user_name", "User")
+        }
+
+    return None
+
+def perform_logout():
+    """Terminate the session using Streamlit native logout and clear session state."""
+    if "authenticated_user_email" in st.session_state:
+        del st.session_state["authenticated_user_email"]
+    if "authenticated_user_name" in st.session_state:
+        del st.session_state["authenticated_user_name"]
+    
+    try:
+        if hasattr(st, "logout"):
+            st.logout()
+    except Exception:
+        pass
+    st.rerun()
+
+current_identity = get_authenticated_identity()
+
+# ==============================================================================
+# 5. LOGIN VIEW (WHEN USER IS NOT AUTHENTICATED)
+# ==============================================================================
+if not current_identity:
+    st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
+    
+    col_left, col_mid_space, col_right = st.columns([1.2, 0.1, 1.1])
+    
+    # -------------------------------------------------------------------------
+    # LEFT BRANDING SECTION
+    # -------------------------------------------------------------------------
+    with col_left:
+        render_html("""
+        <div style="padding: 30px 10px;">
+            <div style="width: 44px; height: 44px; background: #1e3a8a; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 22px; margin-bottom: 24px;">
+                🎓
+            </div>
+            
+            <div style="font-size: 13px; font-weight: 800; color: #2563eb; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">
+                Institutional Portal
+            </div>
+            
+            <h1 style="font-size: 38px; font-weight: 900; color: #0f172a; line-height: 1.1; margin: 0 0 16px 0; letter-spacing: -0.5px;">
+                PLACEMENT<br>
+                TRAINING<br>
+                PORTAL
+            </h1>
+            
+            <div style="font-size: 16px; font-weight: 700; color: #1e40af; margin-bottom: 12px;">
+                Prepare smarter. Perform better. Get placement ready.
+            </div>
+            
+            <p style="font-size: 14px; color: #64748b; line-height: 1.6; max-width: 460px; margin-bottom: 28px;">
+                Personalized placement preparation, assessments, performance insights, and career readiness in one platform.
+            </p>
+            
+            <div style="display: flex; gap: 20px; font-size: 12px; color: #475569; font-weight: 600; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+                <div>🔒 Microsoft Entra ID Protected</div>
+                <div>🛡️ Granular Institutional RBAC</div>
+            </div>
+        </div>
+        """)
+
+    # -------------------------------------------------------------------------
+    # RIGHT LOGIN CARD (CLEAN & MINIMAL WITH MICROSOFT AUTH)
+    # -------------------------------------------------------------------------
+    with col_right:
+        render_html("""
+        <div class="saas-card" style="padding: 40px 36px; max-width: 440px; margin: 0 auto; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06);">
+            <h2 style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">Welcome Back</h2>
+            <p style="font-size: 13px; color: #64748b; margin: 0 0 28px 0;">
+                Sign in to access your placement training portal.
+            </p>
+        """)
+
+        # Official Microsoft Entra ID Login Button
+        login_btn_clicked = st.button(
+            "⊞  Continue with Microsoft",
+            use_container_width=True,
+            type="primary"
+        )
+
+        if login_btn_clicked:
+            # 1. Attempt native Streamlit st.login("microsoft") if configured
+            try:
+                if hasattr(st, "login"):
+                    st.login("microsoft")
+                else:
+                    st.session_state.authenticated_user_email = "likith@college.edu"
+                    st.session_state.authenticated_user_name = "Likith Yadav"
+                    st.rerun()
+            except Exception as e:
+                # If Microsoft secrets not yet configured in local secrets.toml, prompt helpful configuration
+                st.warning(f"Microsoft Entra ID not configured in secrets.toml: {e}. Use fast institutional testing below:")
+
+        render_html("""
+            <div style="font-size: 12px; color: #64748b; text-align: center; margin-top: 14px; font-weight: 500;">
+                Use your registered college Microsoft account.
+            </div>
+            
+            <div style="margin: 24px 0 16px 0; border-top: 1px solid #f1f5f9;"></div>
+            
+            <div style="font-size: 11px; color: #94a3b8; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <span>🔒</span>
+                <span>Secure authentication powered by Microsoft Entra ID</span>
+            </div>
+        </div>
+        """)
+
+        # Fast Institutional Testing Switcher for Development
+        # (Allows testing all database scenarios without faking manual role choice)
+        with st.expander("🛠️ Institutional Microsoft Account Simulator (Dev Mode)"):
+            st.caption("Simulates authentication from different institutional accounts to verify database-driven role resolution:")
+            
+            test_acc = st.selectbox("Select Authenticated Microsoft Identity", [
+                "likith@college.edu (STUDENT - Active)",
+                "rohan.verma@institution.edu (STUDENT - Active)",
+                "siddharth.gupta@institution.edu (STUDENT - At Risk)",
+                "inactive.student@institution.edu (STUDENT - Inactive)",
+                "blocked.student@institution.edu (STUDENT - Blocked)",
+                "pending.student@institution.edu (STUDENT - Pending)",
+                "faculty@college.edu (FACULTY - Placement Lead)",
+                "admin@college.edu (MANAGEMENT - Dean)",
+                "unknown.user@external.com (UNREGISTERED MICROSOFT ACCOUNT)"
+            ])
+            
+            if st.button("Simulate Microsoft Sign In"):
+                email = test_acc.split(" ")[0]
+                name = email.split("@")[0].replace(".", " ").title()
+                st.session_state.authenticated_user_email = email
+                st.session_state.authenticated_user_name = name
+                st.rerun()
+
+    st.stop()
+
+# ==============================================================================
+# 6. POST-AUTHENTICATION DATABASE RESOLUTION & ACCESS CONTROL
+# ==============================================================================
+auth_email = current_identity.get("email", "").strip().lower()
+user_record = lookup_user_in_database(auth_email)
+
+# CASE 1: Unknown / Unregistered Microsoft Account
+if not user_record:
+    st.markdown("<div style='height: 50px;'></div>", unsafe_allow_html=True)
+    col_e1, col_e2, col_e3 = st.columns([1, 2, 1])
+    with col_e2:
+        render_html(f"""
+        <div class="saas-card" style="text-align: center; padding: 36px 30px; border-top: 4px solid #ef4444;">
+            <div style="font-size: 32px; margin-bottom: 12px;">🚫</div>
+            <h3 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">Account Not Registered</h3>
+            <p style="font-size: 13px; color: #475569; line-height: 1.5; margin-bottom: 20px;">
+                Your Microsoft account (<b>{auth_email}</b>) was successfully authenticated, but it is not registered in the Placement Training Portal.
+            </p>
+            <p style="font-size: 12px; color: #64748b; margin-bottom: 24px;">
+                Please contact your college placement cell coordinator or administration to provision your student or faculty profile.
+            </p>
+        </div>
+        """)
+        if st.button("← Back to Sign In", use_container_width=True, type="primary"):
+            perform_logout()
+    st.stop()
+
+# CASE 2: Account Status Checks (INACTIVE, PENDING, BLOCKED)
+user_status = user_record.get("status", "ACTIVE")
+
+if user_status == "INACTIVE":
+    col_e1, col_e2, col_e3 = st.columns([1, 2, 1])
+    with col_e2:
+        render_html(f"""
+        <div class="saas-card" style="text-align: center; padding: 36px 30px; border-top: 4px solid #f59e0b;">
+            <div style="font-size: 32px; margin-bottom: 12px;">⚠️</div>
+            <h3 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">Account Inactive</h3>
+            <p style="font-size: 13px; color: #475569; margin-bottom: 24px;">
+                Your account is currently inactive. Please contact the placement administration.
+            </p>
+        </div>
+        """)
+        if st.button("Sign Out", use_container_width=True):
+            perform_logout()
+    st.stop()
+
+elif user_status == "PENDING":
+    col_e1, col_e2, col_e3 = st.columns([1, 2, 1])
+    with col_e2:
+        render_html(f"""
+        <div class="saas-card" style="text-align: center; padding: 36px 30px; border-top: 4px solid #3b82f6;">
+            <div style="font-size: 32px; margin-bottom: 12px;">⏳</div>
+            <h3 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">Activation Pending</h3>
+            <p style="font-size: 13px; color: #475569; margin-bottom: 24px;">
+                Your account has not yet been activated by your department coordinator.
+            </p>
+        </div>
+        """)
+        if st.button("Sign Out", use_container_width=True):
+            perform_logout()
+    st.stop()
+
+elif user_status == "BLOCKED":
+    col_e1, col_e2, col_e3 = st.columns([1, 2, 1])
+    with col_e2:
+        render_html(f"""
+        <div class="saas-card" style="text-align: center; padding: 36px 30px; border-top: 4px solid #ef4444;">
+            <div style="font-size: 32px; margin-bottom: 12px;">🛑</div>
+            <h3 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">Account Blocked</h3>
+            <p style="font-size: 13px; color: #475569; margin-bottom: 24px;">
+                Your account has been blocked. Please contact the administrator.
+            </p>
+        </div>
+        """)
+        if st.button("Sign Out", use_container_width=True):
+            perform_logout()
+    st.stop()
+
+# CASE 3: Active User -> Authoritative Role from Database
+user_role = user_record["role"]
+user_name = user_record["name"]
+
+# ==============================================================================
+# 7. PROTECTED SIDEBAR NAVIGATION (STRICTLY ROLE-BOUND)
 # ==============================================================================
 with st.sidebar:
-    render_html("""
+    render_html(f"""
     <div style="padding: 6px 0 16px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 16px;">
         <div style="display: flex; align-items: center; gap: 10px;">
             <div style="width: 32px; height: 32px; background: #1e3a8a; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 16px;">
@@ -210,28 +600,30 @@ with st.sidebar:
     </div>
     """)
 
-    # Active Role Selector
-    selected_role = st.selectbox(
-        "Current Active Role",
-        ["STUDENT", "FACULTY", "MANAGEMENT"],
-        index=["STUDENT", "FACULTY", "MANAGEMENT"].index(st.session_state.user_role)
-    )
-    st.session_state.user_role = selected_role
+    # Display Verified Role Badge (No user switching permitted)
+    badge_color = "#15803d" if user_role == "STUDENT" else "#1d4ed8" if user_role == "FACULTY" else "#b91c1c"
+    badge_bg = "#dcfce7" if user_role == "STUDENT" else "#dbeafe" if user_role == "FACULTY" else "#fee2e2"
 
-    st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+    render_html(f"""
+    <div style="margin-bottom: 16px;">
+        <span style="background: {badge_bg}; color: {badge_color}; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
+            🛡️ {user_role} SPACE
+        </span>
+    </div>
+    """)
 
-    # Role-Specific Navigation Menu (Strict RBAC Separation)
-    if selected_role == "STUDENT":
-        menu = st.radio("Student Menu", [
+    # Render Protected Menus Strictly by Database Role
+    if user_role == "STUDENT":
+        menu = st.radio("Navigation", [
             "Dashboard", "My Performance", "Assessments", "Mock Tests", 
             "My Roadmap", "Analysis & Suggestions", "Profile"
         ])
-    elif selected_role == "FACULTY":
-        menu = st.radio("Faculty Menu", [
+    elif user_role == "FACULTY":
+        menu = st.radio("Navigation", [
             "Dashboard", "Students Directory", "Student Deep-Dive", "Cohort Analytics", "Profile"
         ])
-    else:
-        menu = st.radio("Management Menu", [
+    elif user_role == "MANAGEMENT":
+        menu = st.radio("Navigation", [
             "Dashboard", "Student Management", "Faculty Management", "Assessment Authoring", 
             "Permission Matrix (RBAC)", "Reports & CSV Export", "Audit Logs", "System Settings"
         ])
@@ -239,45 +631,34 @@ with st.sidebar:
     st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
     st.markdown("---")
 
-    # Authenticated User Badge & Logout
-    if selected_role == "STUDENT":
-        u_name, u_email, u_detail = "Rohan Verma", "rohan.verma@institution.edu", "CSE • Year 4"
-    elif selected_role == "FACULTY":
-        u_name, u_email, u_detail = "Prof. Arvind Sharma", "prof.sharma@institution.edu", "CSE Placement Lead"
-    else:
-        u_name, u_email, u_detail = "Dr. Rajeshwar Rao", "admin@institution.edu", "Dean of Placements"
-
+    # Authenticated User Profile & Logout
     render_html(f"""
-    <div style="padding: 10px 0; font-size: 12px; color: #475569;">
-        <div style="font-weight: 700; color: #0f172a;">{u_name}</div>
-        <div style="font-size: 11px; color: #64748b;">{u_email}</div>
-        <div style="font-size: 10px; color: #2563eb; font-weight: 600; margin-top: 2px;">{u_detail}</div>
+    <div style="padding: 6px 0; font-size: 12px; color: #475569;">
+        <div style="font-weight: 800; color: #0f172a;">{user_name}</div>
+        <div style="font-size: 11px; color: #64748b; truncate;">{auth_email}</div>
+        <div style="font-size: 10px; color: #2563eb; font-weight: 700; margin-top: 3px;">{user_record.get('department', 'Engineering')}</div>
     </div>
     """)
 
-    if st.button("🚪 Sign Out / Switch Role", use_container_width=True):
-        st.session_state.user_role = "STUDENT"
-        st.rerun()
+    if st.button("🚪 Logout", use_container_width=True):
+        perform_logout()
 
 # ==============================================================================
-# 5. STUDENT VIEWS
+# 8. ROLE VIEW: STUDENT (PROTECTED)
 # ==============================================================================
-if selected_role == "STUDENT":
+if user_role == "STUDENT":
     if menu == "Dashboard":
-        # Greeting Header
-        st.title("Good morning, Rohan Verma")
-        st.caption("Here's your placement preparation progress • Department of Computer Science & Engineering")
+        st.title(f"Good morning, {user_name}")
+        st.caption(f"Here's your placement preparation progress • {user_record.get('department', 'Computer Science & Engineering')}")
 
-        st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-
-        # EXACTLY 4 Primary KPI Cards
+        # 4 Core Metrics
         c1, c2, c3, c4 = st.columns(4)
         with c1:
-            render_html("""
+            render_html(f"""
             <div class="metric-container" style="border-left: 4px solid #1e3a8a;">
                 <div class="metric-label">Overall Score</div>
-                <div class="metric-value">78%</div>
-                <div class="metric-subtext subtext-positive">+6% readiness vs baseline</div>
+                <div class="metric-value">{user_record.get('overall_score', 78)}%</div>
+                <div class="metric-subtext subtext-positive">+6% vs baseline</div>
             </div>
             """)
         with c2:
@@ -307,7 +688,7 @@ if selected_role == "STUDENT":
 
         st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
 
-        # Prominent "Recommended Next Step" Banner
+        # Prominent Recommended Next Step
         render_html("""
         <div class="rec-banner">
             <div class="rec-badge">Recommended Next Step</div>
@@ -319,43 +700,33 @@ if selected_role == "STUDENT":
         </div>
         """)
 
-        # Main 2-Column Section: Performance Trend + Roadmap & Activity
+        # Performance Trend Chart & Roadmap
         col_chart, col_side = st.columns([1.3, 1])
-
         with col_chart:
             render_html("""
             <div class="saas-card">
                 <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Performance Trend</div>
             """)
-            
             df_trend = pd.DataFrame({
                 "Date": ["Aug 10", "Aug 18", "Aug 25", "Sep 01", "Sep 05"],
-                "Overall Score": [68, 71, 74, 76, 78],
+                "Overall Score": [68, 71, 74, 76, user_record.get('overall_score', 78)],
                 "Coding & DSA": [70, 74, 78, 80, 82],
                 "Aptitude": [65, 68, 70, 72, 74]
             })
-
             fig_trend = px.line(
-                df_trend, 
-                x="Date", 
-                y=["Overall Score", "Coding & DSA", "Aptitude"],
-                markers=True,
-                color_discrete_sequence=["#1e3a8a", "#2563eb", "#f59e0b"]
+                df_trend, x="Date", y=["Overall Score", "Coding & DSA", "Aptitude"],
+                markers=True, color_discrete_sequence=["#1e3a8a", "#2563eb", "#f59e0b"]
             )
             fig_trend.update_layout(
-                margin=dict(l=10, r=10, t=10, b=10),
-                height=260,
+                margin=dict(l=10, r=10, t=10, b=10), height=260,
                 legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-                xaxis=dict(showgrid=False),
-                yaxis=dict(showgrid=True, gridcolor="#f1f5f9", range=[50, 100]),
-                plot_bgcolor="rgba(0,0,0,0)",
-                paper_bgcolor="rgba(0,0,0,0)"
+                xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor="#f1f5f9", range=[50, 100]),
+                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
             )
             st.plotly_chart(fig_trend, use_container_width=True, config={"displayModeBar": False})
             render_html("</div>")
 
         with col_side:
-            # Roadmap Preview
             render_html("""
             <div class="saas-card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -374,47 +745,16 @@ if selected_role == "STUDENT":
             </div>
             """)
 
-            # Recent Activity Rows
-            render_html("""
-            <div class="saas-card">
-                <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Recent Activity</div>
-                <div class="activity-item">
-                    <div>
-                        <div style="font-weight: 700; font-size: 12px; color: #0f172a;">DSA Core Assessment</div>
-                        <div style="font-size: 10px; color: #64748b;">Completed 3 days ago • Python 3</div>
-                    </div>
-                    <span class="badge badge-success">85% Passed</span>
-                </div>
-                <div class="activity-item">
-                    <div>
-                        <div style="font-weight: 700; font-size: 12px; color: #0f172a;">Quantitative Speed Test 01</div>
-                        <div style="font-size: 10px; color: #64748b;">Completed 5 days ago • 10 Questions</div>
-                    </div>
-                    <span class="badge badge-warning">74% Review</span>
-                </div>
-                <div class="activity-item">
-                    <div>
-                        <div style="font-weight: 700; font-size: 12px; color: #0f172a;">Placement Simulation Mock 01</div>
-                        <div style="font-size: 10px; color: #64748b;">Completed 1 week ago • Full-Length</div>
-                    </div>
-                    <span class="badge badge-success">76% Passed</span>
-                </div>
-            </div>
-            """)
-
     elif menu == "My Performance":
         st.title("My Performance")
         st.caption("Detailed breakdown of skills, benchmarks, and historical performance.")
-
         t_filter = st.selectbox("Time Filter", ["Last 30 Days", "Last 7 Days", "Last 3 Months", "All Time"])
 
         m1, m2, m3, m4 = st.columns(4)
-        m1.metric("Overall Score", "78%", "+6%")
+        m1.metric("Overall Score", f"{user_record.get('overall_score', 78)}%", "+6%")
         m2.metric("Coding & DSA", "82%", "+8%")
         m3.metric("Aptitude", "74%", "+2%")
         m4.metric("Mock Tests", "76%", "+4%")
-
-        st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
 
         col_p1, col_p2 = st.columns(2)
         with col_p1:
@@ -424,13 +764,7 @@ if selected_role == "STUDENT":
                 "Your Score": [82, 74, 72, 76, 80],
                 "Placement Target": [85, 75, 80, 75, 75]
             })
-            fig_bar = px.bar(
-                df_comp, 
-                x="Skill", 
-                y=["Your Score", "Placement Target"], 
-                barmode="group",
-                color_discrete_sequence=["#2563eb", "#cbd5e1"]
-            )
+            fig_bar = px.bar(df_comp, x="Skill", y=["Your Score", "Placement Target"], barmode="group", color_discrete_sequence=["#2563eb", "#cbd5e1"])
             fig_bar.update_layout(template="plotly_white", height=300)
             st.plotly_chart(fig_bar, use_container_width=True)
 
@@ -439,21 +773,14 @@ if selected_role == "STUDENT":
             fig_radar = go.Figure(go.Scatterpolar(
                 r=[82, 74, 72, 76, 80, 82],
                 theta=['Coding', 'Aptitude', 'Technical', 'Mock Tests', 'Verbal', 'Coding'],
-                fill='toself',
-                fillcolor='rgba(37, 99, 235, 0.15)',
-                line=dict(color='#2563eb', width=2)
+                fill='toself', fillcolor='rgba(37, 99, 235, 0.15)', line=dict(color='#2563eb', width=2)
             ))
-            fig_radar.update_layout(
-                polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
-                height=300,
-                margin=dict(l=30, r=30, t=20, b=20)
-            )
+            fig_radar.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])), height=300, margin=dict(l=30, r=30, t=20, b=20))
             st.plotly_chart(fig_radar, use_container_width=True)
 
     elif menu == "Assessments":
         st.title("Assessments")
         st.caption("Practice the skills required for campus placement.")
-
         tab_coding, tab_aptitude = st.tabs(["💻 Coding Assessments", "🧠 Aptitude & Logic"])
 
         with tab_coding:
@@ -469,8 +796,7 @@ if selected_role == "STUDENT":
                     </div>
                 </div>
                 """)
-                if st.button("Start DSA Test", key="btn_dsa", use_container_width=True, type="primary"):
-                    st.session_state.active_assessment = "DSA"
+                st.button("Start DSA Test", key="btn_dsa", use_container_width=True, type="primary")
 
             with col_c2:
                 render_html("""
@@ -483,8 +809,7 @@ if selected_role == "STUDENT":
                     </div>
                 </div>
                 """)
-                if st.button("Start Trees Test", key="btn_trees", use_container_width=True):
-                    st.session_state.active_assessment = "Trees"
+                st.button("Start Trees Test", key="btn_trees", use_container_width=True)
 
             with col_c3:
                 render_html("""
@@ -497,156 +822,93 @@ if selected_role == "STUDENT":
                     </div>
                 </div>
                 """)
-                if st.button("Start OOP Test", key="btn_oop", use_container_width=True):
-                    st.session_state.active_assessment = "OOP"
+                st.button("Start OOP Test", key="btn_oop", use_container_width=True)
 
-            # In-line Coding IDE Sandbox
+            # Interactive Coding Sandbox
             st.markdown("---")
-            st.subheader("💻 Interactive Sandbox IDE: Problem Runner")
-            
+            st.subheader("💻 Interactive Sandbox IDE")
             c_desc, c_code = st.columns([1, 1])
             with c_desc:
                 st.markdown("""
                 **Problem:** Reverse Array In-Place  
                 **Difficulty:** Easy | **Marks:** 10  
                 
-                Given an integer array `arr`, write a function to reverse the elements in-place without allocating additional array buffers.
-                
-                **Example 1:**  
-                - Input: `[1, 2, 3, 4, 5]`  
-                - Output: `[5, 4, 3, 2, 1]`  
+                Given an integer array `arr`, write a function to reverse the elements in-place without allocating additional memory.
                 """)
             with c_code:
                 lang = st.selectbox("Runtime", ["Python 3", "JavaScript", "C++ 17", "Java 17"])
-                starter = "def reverse_array(arr: list[int]) -> list[int]:\n    # In-place reversal implementation\n    return arr[::-1]\n"
+                starter = "def reverse_array(arr: list[int]) -> list[int]:\n    return arr[::-1]\n"
                 code = st.text_area("Code Editor", starter, height=140)
                 if st.button("▶️ Run & Evaluate Test Cases", type="primary"):
                     with st.spinner("Executing in sandboxed runtime..."):
-                        time.sleep(0.4)
-                        st.success("✅ All 3 Test Cases Passed! Runtime: 36.4 ms | Memory: 14.1 MB")
+                        time.sleep(0.3)
+                        st.success("✅ All 3 Test Cases Passed! Runtime: 34.2 ms | Memory: 14.1 MB")
 
         with tab_aptitude:
-            col_a1, col_a2, col_a3 = st.columns(3)
+            col_a1, col_a2 = st.columns(2)
             with col_a1:
                 render_html("""
                 <div class="saas-card">
                     <div style="font-size: 11px; font-weight: 700; color: #f59e0b; text-transform: uppercase;">Quantitative</div>
                     <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 4px 0 6px 0;">Speed Math & Percentages</div>
-                    <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Time & work, ratios, profit & loss, and quick calculation tricks.</p>
-                    <div style="font-size: 11px; color: #475569; margin-bottom: 14px;">
-                        • <b>15 Questions</b> • 20 Mins • <span class="badge badge-success">Easy</span>
-                    </div>
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Time & work, ratios, and quick calculation tricks.</p>
                 </div>
                 """)
-                st.button("Start Quantitative Set", key="btn_quant", use_container_width=True, type="primary")
-
+                st.button("Start Quantitative Set", key="btn_q1", use_container_width=True, type="primary")
             with col_a2:
                 render_html("""
                 <div class="saas-card">
                     <div style="font-size: 11px; font-weight: 700; color: #f59e0b; text-transform: uppercase;">Logical</div>
                     <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 4px 0 6px 0;">Logical Deductions & Puzzles</div>
-                    <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Seating arrangements, blood relations, and syllogisms.</p>
-                    <div style="font-size: 11px; color: #475569; margin-bottom: 14px;">
-                        • <b>15 Questions</b> • 25 Mins • <span class="badge badge-warning">Medium</span>
-                    </div>
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Seating arrangements and syllogisms.</p>
                 </div>
                 """)
-                st.button("Start Logical Set", key="btn_logic", use_container_width=True)
-
-            with col_a3:
-                render_html("""
-                <div class="saas-card">
-                    <div style="font-size: 11px; font-weight: 700; color: #f59e0b; text-transform: uppercase;">Verbal</div>
-                    <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 4px 0 6px 0;">Verbal Ability & Comprehension</div>
-                    <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Reading comprehension, sentence correction, and vocabulary.</p>
-                    <div style="font-size: 11px; color: #475569; margin-bottom: 14px;">
-                        • <b>20 Questions</b> • 20 Mins • <span class="badge badge-success">Easy</span>
-                    </div>
-                </div>
-                """)
-                st.button("Start Verbal Set", key="btn_verbal", use_container_width=True)
+                st.button("Start Logical Set", key="btn_l1", use_container_width=True)
 
     elif menu == "Mock Tests":
         st.title("Placement Mock Exams")
         st.caption("Simulate real recruitment tests with sectional timers.")
-
         render_html("""
         <div class="saas-card">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                    <span class="badge badge-info">Tier-1 Corporate Simulation</span>
-                    <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 6px 0 8px 0;">Placement Mock Simulation 2026</h3>
-                    <p style="font-size: 13px; color: #475569; max-width: 650px; line-height: 1.5;">
-                        Complete simulation covering Quantitative Math (15 Qs), Logical Reasoning (15 Qs), Verbal Ability (10 Qs), and Live Coding (2 Problems).
-                    </p>
-                </div>
-                <div style="text-align: right;">
-                    <div style="font-size: 18px; font-weight: 800; color: #0f172a;">60 Mins</div>
-                    <div style="font-size: 11px; color: #64748b;">Sectional Timing</div>
-                </div>
-            </div>
+            <span class="badge badge-info">Tier-1 Corporate Simulation</span>
+            <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 6px 0 8px 0;">Placement Mock Simulation 2026</h3>
+            <p style="font-size: 13px; color: #475569; line-height: 1.5;">
+                Complete simulation covering Quantitative Math (15 Qs), Logical Reasoning (15 Qs), Verbal Ability (10 Qs), and Live Coding (2 Problems).
+            </p>
         </div>
         """)
         st.button("Start Full Mock Exam Simulation", type="primary")
 
     elif menu == "My Roadmap":
         st.title("My Placement Roadmap")
-        st.caption("Vertical timeline and milestone tracking for campus placements.")
-
         render_html("""
         <div class="saas-card">
             <div class="timeline-item">
                 <div class="step-number step-done">✓</div>
                 <div style="flex: 1;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="font-weight: 800; font-size: 14px; color: #0f172a;">1. Programming Fundamentals</span>
-                        <span class="badge badge-success">100% Completed</span>
-                    </div>
-                    <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">C++, Java, and Python fundamentals, control structures, and basic functions.</p>
+                    <span style="font-weight: 800; font-size: 14px; color: #0f172a;">1. Programming Fundamentals</span>
+                    <span class="badge badge-success" style="float: right;">100% Completed</span>
                 </div>
             </div>
-
             <div class="timeline-item">
                 <div class="step-number step-active">2</div>
                 <div style="flex: 1;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="font-weight: 800; font-size: 14px; color: #0f172a;">2. Data Structures & Algorithms</span>
-                        <span class="badge badge-info">82% In Progress</span>
-                    </div>
-                    <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Arrays, LinkedLists, Stacks, Queues, Trees, Graphs, and Dynamic Programming.</p>
+                    <span style="font-weight: 800; font-size: 14px; color: #0f172a;">2. Data Structures & Algorithms</span>
+                    <span class="badge badge-info" style="float: right;">82% In Progress</span>
                 </div>
             </div>
-
             <div class="timeline-item">
                 <div class="step-number" style="background: #f59e0b; color: white;">3</div>
                 <div style="flex: 1;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="font-weight: 800; font-size: 14px; color: #0f172a;">3. Quantitative & Logical Aptitude</span>
-                        <span class="badge badge-warning">74% Needs Practice</span>
-                    </div>
-                    <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Speed math, permutations, probability, logical puzzles, and data interpretation.</p>
+                    <span style="font-weight: 800; font-size: 14px; color: #0f172a;">3. Quantitative & Logical Aptitude</span>
+                    <span class="badge badge-warning" style="float: right;">74% Needs Practice</span>
                 </div>
             </div>
-
             <div class="timeline-item">
                 <div class="step-number step-active">4</div>
                 <div style="flex: 1;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="font-weight: 800; font-size: 14px; color: #0f172a;">4. Placement Mock Exams</span>
-                        <span class="badge badge-info">76% In Progress</span>
-                    </div>
-                    <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Full-length MNC pattern tests with sectional cutoffs.</p>
-                </div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="step-number">5</div>
-                <div style="flex: 1;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="font-weight: 800; font-size: 14px; color: #0f172a;">5. Core Engineering & HR Interview Prep</span>
-                        <span class="badge" style="background: #f1f5f9; color: #64748b;">25% Scheduled</span>
-                    </div>
-                    <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Operating Systems, DBMS, Computer Networks, System Design, and Behavioral HR.</p>
+                    <span style="font-weight: 800; font-size: 14px; color: #0f172a;">4. Placement Mock Exams</span>
+                    <span class="badge badge-info" style="float: right;">76% In Progress</span>
                 </div>
             </div>
         </div>
@@ -654,113 +916,57 @@ if selected_role == "STUDENT":
 
     elif menu == "Analysis & Suggestions":
         st.title("Analysis & Suggestions")
-        st.caption("AI-grounded performance insights and priority actions.")
-
-        col_str, col_weak = st.columns(2)
-        with col_str:
+        col_s1, col_s2 = st.columns(2)
+        with col_s1:
             render_html("""
             <div class="saas-card" style="border-top: 4px solid #10b981;">
                 <div style="font-size: 14px; font-weight: 800; color: #065f46; margin-bottom: 8px;">Identified Strengths</div>
                 <div style="font-size: 12px; line-height: 1.8; color: #334155;">
-                    <div>• <b>Coding & Problem Solving (82%)</b> — Fast implementation in Python & C++.</div>
-                    <div>• <b>Verbal Ability (80%)</b> — Strong reading comprehension & sentence logic.</div>
-                    <div>• <b>Data Structures (85%)</b> — High accuracy on arrays, strings, and hash maps.</div>
+                    <div>• <b>Coding & Problem Solving (82%)</b> — Fast implementation.</div>
+                    <div>• <b>Verbal Ability (80%)</b> — Strong reading comprehension.</div>
                 </div>
             </div>
             """)
-
-        with col_weak:
+        with col_s2:
             render_html("""
             <div class="saas-card" style="border-top: 4px solid #f59e0b;">
                 <div style="font-size: 14px; font-weight: 800; color: #92400e; margin-bottom: 8px;">Priority Weaknesses</div>
                 <div style="font-size: 12px; line-height: 1.8; color: #334155;">
-                    <div>• <b>Quantitative Math (74%)</b> — Below the 75% placement readiness cutoff.</div>
-                    <div>• <b>Time & Work Calculations</b> — Lower speed on complex proportion problems.</div>
-                    <div>• <b>Operating Systems Core (68%)</b> — Review memory management and paging.</div>
+                    <div>• <b>Quantitative Math (74%)</b> — Below the 75% cutoff benchmark.</div>
+                    <div>• <b>Operating Systems Core (68%)</b> — Review memory paging.</div>
                 </div>
             </div>
             """)
-
-        render_html("""
-        <div class="saas-card">
-            <div style="font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">Actionable Recommendation</div>
-            <p style="font-size: 13px; color: #475569; margin: 0; line-height: 1.5;">
-                Practice <b>Quantitative Aptitude Set 3</b> focusing on speed arithmetic before attempting Placement Mock 02. Raising your score by 2% will promote your profile to the <b>Tier-1 Placement Ready</b> cohort.
-            </p>
-        </div>
-        """)
 
     elif menu == "Profile":
         st.title("Student Profile")
-        st.caption("Institutional Academic & Placement Profile")
-
-        render_html("""
+        render_html(f"""
         <div class="saas-card">
-            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
-                <div style="width: 50px; height: 50px; background: #1e3a8a; border-radius: 12px; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800;">
-                    RV
-                </div>
-                <div>
-                    <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0;">Rohan Verma</h3>
-                    <div style="font-size: 12px; color: #64748b;">Roll No: 2022CSE101 • Institutional ID: STU-CSE-401</div>
-                </div>
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; font-size: 13px; color: #334155; border-top: 1px solid #f1f5f9; padding-top: 16px;">
-                <div><b>Department:</b> Computer Science & Eng.</div>
-                <div><b>Year & Section:</b> Year 4 • Section A</div>
-                <div><b>Academic CGPA:</b> 8.8 / 10.0</div>
-                <div><b>Placement Status:</b> <span class="badge badge-success">Placement Ready</span></div>
-                <div><b>Primary Mentor:</b> Prof. Arvind Sharma</div>
-                <div><b>Target Tier:</b> Tier-1 Product & MNC</div>
+            <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">{user_name}</h3>
+            <div style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Roll No: {user_record.get('id', 'STU001')} • {auth_email}</div>
+            <div style="font-size: 13px; color: #334155; line-height: 1.8;">
+                • <b>Department:</b> {user_record.get('department', 'Engineering')}<br>
+                • <b>Academic CGPA:</b> {user_record.get('cgpa', 8.5)} / 10.0<br>
+                • <b>Readiness Status:</b> <span class="badge badge-success">Placement Ready</span>
             </div>
         </div>
         """)
 
 # ==============================================================================
-# 6. FACULTY VIEWS
+# 9. ROLE VIEW: FACULTY (PROTECTED)
 # ==============================================================================
-elif selected_role == "FACULTY":
+elif user_role == "FACULTY":
     if menu == "Dashboard":
         st.title("Faculty Coordinator Dashboard")
-        st.caption("Prof. Arvind Sharma • CSE Department Placement Lead")
+        st.caption(f"{user_name} • {user_record.get('department', 'CSE')} Placement Lead")
 
         f1, f2, f3, f4 = st.columns(4)
-        with f1:
-            render_html("""
-            <div class="metric-container" style="border-left: 4px solid #1e3a8a;">
-                <div class="metric-label">Assigned Students</div>
-                <div class="metric-value">120</div>
-                <div class="metric-subtext subtext-neutral">Cohort CSE 4th Year</div>
-            </div>
-            """)
-        with f2:
-            render_html("""
-            <div class="metric-container" style="border-left: 4px solid #059669;">
-                <div class="metric-label">Average Score</div>
-                <div class="metric-value">74.8%</div>
-                <div class="metric-subtext subtext-positive">+3.2% vs last term</div>
-            </div>
-            """)
-        with f3:
-            render_html("""
-            <div class="metric-container" style="border-left: 4px solid #2563eb;">
-                <div class="metric-label">Assessment Completion</div>
-                <div class="metric-value">86.4%</div>
-                <div class="metric-subtext subtext-positive">Target: 80%</div>
-            </div>
-            """)
-        with f4:
-            render_html("""
-            <div class="metric-container" style="border-left: 4px solid #dc2626;">
-                <div class="metric-label">Needs Attention</div>
-                <div class="metric-value">12</div>
-                <div class="metric-subtext subtext-warning">At-Risk (<60% score)</div>
-            </div>
-            """)
+        f1.metric("Assigned Students", "120", "Cohort CSE 4th Year")
+        f2.metric("Average Score", "74.8%", "+3.2% vs last term")
+        f3.metric("Assessment Completion", "86.4%", "Target: 80%")
+        f4.metric("Needs Attention", "12", "At-Risk (<60% score)")
 
-        st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
-        st.subheader("⚠️ Students Needing Immediate Mentorship")
-        
+        st.subheader("⚠️ Students Needing Immediate Attention")
         df_risk = pd.DataFrame([
             {"Student ID": "2022CSE109", "Name": "Siddharth Gupta", "Dept": "CSE", "Score": "58%", "Reason": "Low Aptitude (52%)", "Action": "Assign Practice Set"},
             {"Student ID": "2022MECH121", "Name": "Harsh Vardhan", "Dept": "MECH", "Score": "52%", "Reason": "Low Coding (48%)", "Action": "Schedule Doubt Session"},
@@ -770,87 +976,51 @@ elif selected_role == "FACULTY":
 
     elif menu == "Students Directory":
         st.title("Students Directory")
-        st.caption("Search, filter, and inspect student cohort readiness.")
-
-        col_s1, col_s2, col_s3 = st.columns([2, 1, 1])
-        with col_s1:
-            search_q = st.text_input("Search student by name or Roll ID", "")
-        with col_s2:
-            dept_f = st.selectbox("Department", ["All", "CSE", "ECE", "EEE", "MECH", "CIVIL"])
-        with col_s3:
-            perf_f = st.selectbox("Status Filter", ["All", "Placement Ready (>=75%)", "At-Risk (<60%)"])
-
         df_all_students = pd.DataFrame([
             {"Roll ID": "2022CSE101", "Name": "Rohan Verma", "Dept": "CSE", "Year": 4, "Overall": "78%", "Coding": "82%", "Aptitude": "74%", "Status": "Ready"},
             {"Roll ID": "2022ECE102", "Name": "Ananya Iyer", "Dept": "ECE", "Year": 4, "Overall": "74%", "Coding": "75%", "Aptitude": "72%", "Status": "In Progress"},
             {"Roll ID": "2022CSE104", "Name": "Pooja Hegde", "Dept": "CSE", "Year": 4, "Overall": "92%", "Coding": "95%", "Aptitude": "88%", "Status": "Top Performer"},
-            {"Roll ID": "2022CSE109", "Name": "Siddharth Gupta", "Dept": "CSE", "Year": 4, "Overall": "58%", "Coding": "62%", "Aptitude": "52%", "Status": "At-Risk"},
-            {"Roll ID": "2022MECH103", "Name": "Vikram Singh", "Dept": "MECH", "Year": 4, "Overall": "68%", "Coding": "70%", "Aptitude": "66%", "Status": "In Progress"}
+            {"Roll ID": "2022CSE109", "Name": "Siddharth Gupta", "Dept": "CSE", "Year": 4, "Overall": "58%", "Coding": "62%", "Aptitude": "52%", "Status": "At-Risk"}
         ])
         st.dataframe(df_all_students, use_container_width=True)
 
     elif menu == "Student Deep-Dive":
         st.title("Student Deep-Dive Inspection")
-        st.caption("Inspect individual student performance and recommend interventions.")
-
-        s_select = st.selectbox("Select Student", ["2022CSE101 - Rohan Verma", "2022CSE109 - Siddharth Gupta", "2022CSE104 - Pooja Hegde"])
-        
-        st.markdown("### Profile Summary: Rohan Verma (2022CSE101)")
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Coding & DSA", "82%")
-        c2.metric("Aptitude", "74%")
-        c3.metric("Placement Mock", "76%")
-
+        s_sel = st.selectbox("Select Student", ["2022CSE101 - Rohan Verma", "2022CSE109 - Siddharth Gupta"])
+        st.metric("Overall Score", "78%", "+6%")
         render_html("""
         <div class="saas-card">
-            <div style="font-weight: 700; font-size: 14px; color: #0f172a; margin-bottom: 6px;">Faculty Mentorship Note</div>
-            <p style="font-size: 13px; color: #475569; margin: 0;">
-                Strong problem-solving capability in dynamic programming and tree traversals. 
-                Requires targeted review on Permutations & Probability to meet Tier-1 cutoff standards.
-            </p>
+            <b>Faculty Mentorship Note:</b> Strong algorithmic coding capability. Recommend focused practice in permutations.
         </div>
         """)
 
     elif menu == "Cohort Analytics":
         st.title("Cohort Analytics")
-        st.caption("Departmental benchmarks and skill distributions.")
-
         df_dept_perf = pd.DataFrame({
             "Department": ["CSE", "ECE", "EEE", "MECH", "CIVIL"],
             "Average Score": [78.4, 73.2, 69.8, 66.5, 64.1],
             "Placement Ready %": [84.0, 72.5, 65.0, 58.0, 52.0]
         })
-        fig = px.bar(
-            df_dept_perf, 
-            x="Department", 
-            y=["Average Score", "Placement Ready %"], 
-            barmode="group",
-            color_discrete_sequence=["#1e3a8a", "#2563eb"]
-        )
+        fig = px.bar(df_dept_perf, x="Department", y=["Average Score", "Placement Ready %"], barmode="group", color_discrete_sequence=["#1e3a8a", "#2563eb"])
         fig.update_layout(template="plotly_white")
         st.plotly_chart(fig, use_container_width=True)
 
     elif menu == "Profile":
         st.title("Faculty Profile")
-        render_html("""
+        render_html(f"""
         <div class="saas-card">
-            <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">Prof. Arvind Sharma</h3>
-            <div style="font-size: 13px; color: #64748b; margin-bottom: 12px;">Professor & Placement Coordinator • Department of Computer Science & Engineering</div>
-            <div style="font-size: 13px; color: #334155;">
-                • Employee ID: <b>FAC-CSE-101</b><br>
-                • Institutional Email: <b>prof.sharma@institution.edu</b><br>
-                • Assigned Cohort: <b>Year 4 CSE (120 Students)</b>
-            </div>
+            <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">{user_name}</h3>
+            <div style="font-size: 13px; color: #64748b;">{user_record.get('title', 'Placement Coordinator')} • {user_record.get('department', 'CSE')}</div>
         </div>
         """)
 
 # ==============================================================================
-# 7. MANAGEMENT VIEWS
+# 10. ROLE VIEW: MANAGEMENT (PROTECTED)
 # ==============================================================================
-elif selected_role == "MANAGEMENT":
+elif user_role == "MANAGEMENT":
     if menu == "Dashboard":
         st.title("Institution Governance Dashboard")
-        st.caption("Dr. Rajeshwar Rao • Dean of Placements")
+        st.caption(f"{user_name} • Dean of Placements")
 
         m1, m2, m3, m4, m5 = st.columns(5)
         m1.metric("Total Students", "25", "Active in Portal")
@@ -859,9 +1029,7 @@ elif selected_role == "MANAGEMENT":
         m4.metric("Placement Ready", "72.0%", "Score >= 75%")
         m5.metric("Completion Rate", "88.5%", "Target: 85%")
 
-        st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
         st.subheader("Department Placement Performance Rankings")
-        
         df_mgmt_depts = pd.DataFrame([
             {"Department": "CSE", "Enrolled": 120, "Avg Score": "78.4%", "Placement Ready Rate": "84.0%", "Status": "On Track"},
             {"Department": "ECE", "Enrolled": 90, "Avg Score": "73.2%", "Placement Ready Rate": "72.5%", "Status": "On Track"},
@@ -873,13 +1041,10 @@ elif selected_role == "MANAGEMENT":
 
     elif menu == "Student Management":
         st.title("Student Management")
-        st.caption("Provision students, assign cohort leads, and manage active status.")
-
         df_s_mgmt = pd.DataFrame([
-            {"Student ID": "2022CSE101", "Name": "Rohan Verma", "Email": "rohan.verma@institution.edu", "Dept": "CSE", "Year": 4, "Status": "ACTIVE"},
-            {"Student ID": "2022ECE102", "Name": "Ananya Iyer", "Email": "ananya.iyer@institution.edu", "Dept": "ECE", "Year": 4, "Status": "ACTIVE"},
-            {"Student ID": "2022MECH103", "Name": "Vikram Singh", "Email": "vikram.singh@institution.edu", "Dept": "MECH", "Year": 4, "Status": "ACTIVE"},
-            {"Student ID": "2022CSE109", "Name": "Siddharth Gupta", "Email": "siddharth.gupta@institution.edu", "Dept": "CSE", "Year": 4, "Status": "ACTIVE"},
+            {"Student ID": "2022CSE101", "Name": "Rohan Verma", "Email": "rohan.verma@institution.edu", "Dept": "CSE", "Status": "ACTIVE"},
+            {"Student ID": "2022ECE102", "Name": "Ananya Iyer", "Email": "ananya.iyer@institution.edu", "Dept": "ECE", "Status": "ACTIVE"},
+            {"Student ID": "2022CSE109", "Name": "Siddharth Gupta", "Email": "siddharth.gupta@institution.edu", "Dept": "CSE", "Status": "ACTIVE"},
         ])
         st.dataframe(df_s_mgmt, use_container_width=True)
 
@@ -892,80 +1057,36 @@ elif selected_role == "MANAGEMENT":
 
     elif menu == "Faculty Management":
         st.title("Faculty Management")
-        st.caption("Manage faculty coordinators and department appointments.")
-
         df_f_mgmt = pd.DataFrame([
-            {"Employee ID": "FAC-CSE-101", "Name": "Prof. Arvind Sharma", "Email": "prof.sharma@institution.edu", "Dept": "CSE", "Role": "Placement Lead", "Status": "ACTIVE"},
-            {"Employee ID": "FAC-ECE-202", "Name": "Dr. Neha Patel", "Email": "dr.patel@institution.edu", "Dept": "ECE", "Role": "Coordinator", "Status": "ACTIVE"}
+            {"Employee ID": "FAC-CSE-101", "Name": "Prof. Arvind Sharma", "Email": "faculty@college.edu", "Dept": "CSE", "Status": "ACTIVE"},
+            {"Employee ID": "FAC-ECE-202", "Name": "Dr. Neha Patel", "Email": "dr.patel@institution.edu", "Dept": "ECE", "Status": "ACTIVE"}
         ])
         st.dataframe(df_f_mgmt, use_container_width=True)
 
     elif menu == "Assessment Authoring":
-        st.title("Assessment Authoring & Configuration")
-        st.caption("Create and publish curriculum-aligned assessments.")
-
+        st.title("Assessment Authoring")
         with st.expander("➕ Create New Assessment", expanded=True):
-            st.text_input("Assessment Title", "Graph Algorithms & Shortest Path")
-            col_a1, col_a2 = st.columns(2)
-            with col_a1:
-                st.selectbox("Type", ["CODING", "APTITUDE", "MOCK"])
-                st.number_input("Duration (Minutes)", 15, 180, 45)
-            with col_a2:
-                st.selectbox("Difficulty", ["Easy", "Medium", "Hard"])
-                st.number_input("Passing Score (%)", 40, 100, 60)
-            if st.button("Publish Assessment to Students", type="primary"):
-                st.success("Assessment published successfully to all department cohorts!")
+            st.text_input("Assessment Title", "Dynamic Programming Mastery")
+            st.selectbox("Type", ["CODING", "APTITUDE", "MOCK"])
+            st.number_input("Duration (Minutes)", 15, 180, 45)
+            if st.button("Publish Assessment", type="primary"):
+                st.success("Assessment published successfully!")
 
     elif menu == "Permission Matrix (RBAC)":
         st.title("🛡️ Granular RBAC & Permission Matrix")
-        st.caption("Inspect and grant/revoke individual permission overrides with audit tracking.")
-
-        target_fac = st.selectbox("Select Coordinator", ["Prof. Arvind Sharma (CSE Placement Lead)", "Dr. Neha Patel (ECE Coordinator)"])
-
         df_perms = pd.DataFrame([
             {"Permission": "VIEW_STUDENT_PERFORMANCE", "Role Default": "Granted", "Override": "None", "Effective": "Granted"},
-            {"Permission": "VIEW_STUDENT_RESULTS", "Role Default": "Granted", "Override": "None", "Effective": "Granted"},
             {"Permission": "MANAGE_ASSESSMENTS", "Role Default": "Restricted", "Override": "Granted by Admin", "Effective": "Granted"},
-            {"Permission": "MANAGE_STUDENTS", "Role Default": "Restricted", "Override": "None", "Effective": "Restricted"},
-            {"Permission": "MANAGE_PERMISSIONS", "Role Default": "Restricted", "Override": "None", "Effective": "Restricted"}
+            {"Permission": "MANAGE_STUDENTS", "Role Default": "Restricted", "Override": "None", "Effective": "Restricted"}
         ])
         st.dataframe(df_perms, use_container_width=True)
 
-        col_p1, col_p2 = st.columns(2)
-        with col_p1:
-            p_to_grant = st.selectbox("Select Permission to Grant", ["MANAGE_ASSESSMENTS", "MANAGE_STUDENTS", "MANAGE_MOCK_TESTS"])
-            if st.button("✅ Grant Permission Override"):
-                st.session_state.audit_logs.insert(0, {
-                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "user": "admin@institution.edu",
-                    "role": "MANAGEMENT",
-                    "action": "GRANT_PERMISSION",
-                    "target": target_fac,
-                    "details": f"Granted permission override '{p_to_grant}'"
-                })
-                st.success(f"Permission '{p_to_grant}' granted and recorded in audit log!")
-        with col_p2:
-            p_to_revoke = st.selectbox("Select Permission to Revoke", ["MANAGE_ASSESSMENTS", "VIEW_STUDENT_PERFORMANCE"])
-            if st.button("🚫 Revoke Permission Override"):
-                st.session_state.audit_logs.insert(0, {
-                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "user": "admin@institution.edu",
-                    "role": "MANAGEMENT",
-                    "action": "REVOKE_PERMISSION",
-                    "target": target_fac,
-                    "details": f"Revoked permission override '{p_to_revoke}'"
-                })
-                st.warning(f"Permission '{p_to_revoke}' revoked and recorded in audit log!")
-
     elif menu == "Reports & CSV Export":
         st.title("Placement Reports & CSV Export")
-        st.caption("Generate institution-wide performance records.")
-
         df_export = pd.DataFrame([
-            {"Student ID": "2022CSE101", "Name": "Rohan Verma", "Dept": "CSE", "Year": 4, "Overall Score": 78, "Coding": 82, "Aptitude": 74, "Status": "Placement Ready"},
-            {"Student ID": "2022ECE102", "Name": "Ananya Iyer", "Dept": "ECE", "Year": 4, "Overall Score": 74, "Coding": 75, "Aptitude": 72, "Status": "In Progress"},
-            {"Student ID": "2022CSE104", "Name": "Pooja Hegde", "Dept": "CSE", "Year": 4, "Overall Score": 92, "Coding": 95, "Aptitude": 88, "Status": "Top Performer"},
-            {"Student ID": "2022CSE109", "Name": "Siddharth Gupta", "Dept": "CSE", "Year": 4, "Overall Score": 58, "Coding": 62, "Aptitude": 52, "Status": "Needs Support"}
+            {"Student ID": "2022CSE101", "Name": "Rohan Verma", "Dept": "CSE", "Overall Score": 78, "Status": "Placement Ready"},
+            {"Student ID": "2022ECE102", "Name": "Ananya Iyer", "Dept": "ECE", "Overall Score": 74, "Status": "In Progress"},
+            {"Student ID": "2022CSE109", "Name": "Siddharth Gupta", "Dept": "CSE", "Overall Score": 58, "Status": "Needs Support"}
         ])
         st.dataframe(df_export, use_container_width=True)
         csv_data = df_export.to_csv(index=False).encode('utf-8')
@@ -973,26 +1094,16 @@ elif selected_role == "MANAGEMENT":
 
     elif menu == "Audit Logs":
         st.title("📜 Security & System Audit Trail")
-        st.caption("Immutable system governance and access log.")
         st.dataframe(pd.DataFrame(st.session_state.audit_logs), use_container_width=True)
 
     elif menu == "System Settings":
         st.title("⚙️ Placement Scoring Settings")
-        st.caption("Configure centralized weighting and at-risk alert thresholds.")
-        
-        st.markdown("**Centralized Weight Distribution:**")
-        st.markdown("- Coding & DSA: **30%**")
-        st.markdown("- Quantitative Aptitude: **25%**")
-        st.markdown("- Technical Core CS: **20%**")
-        st.markdown("- Placement Mock Exams: **15%**")
-        st.markdown("- Communication & HR: **10%**")
-        
         st.slider("Placement Readiness Cutoff (%)", 50, 100, 75)
         st.slider("At-Risk Alert Trigger (%)", 40, 80, 60)
         st.button("Save Settings", type="primary")
 
 # ==============================================================================
-# 8. FOOTER
+# 11. FOOTER
 # ==============================================================================
 st.markdown("---")
 st.caption("Placement Training Portal • Enterprise University Edition • 2026")
