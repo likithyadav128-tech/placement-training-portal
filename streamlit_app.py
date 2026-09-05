@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 import time
+import textwrap
 from datetime import datetime
 
 # Configure Page
@@ -13,10 +14,13 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+def render_html(html_str: str):
+    """Helper to render dedented HTML safely in Streamlit without markdown code block triggers."""
+    st.markdown(textwrap.dedent(html_str).strip(), unsafe_allow_html=True)
+
 # Custom Styling (Pastel Lavender Glassmorphic Aesthetic matching screenshot)
-st.markdown("""
+render_html("""
 <style>
-    /* Global Styles */
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
     
     html, body, [class*="css"] {
@@ -78,11 +82,6 @@ st.markdown("""
         border-radius: 6px;
     }
 
-    .sidebar .sidebar-content {
-        background-color: #ffffff;
-    }
-
-    /* Section Headings */
     .widget-title {
         font-weight: 800;
         font-size: 0.95rem;
@@ -129,7 +128,7 @@ st.markdown("""
         text-align: center;
     }
 </style>
-""", unsafe_allow_html=True)
+""")
 
 # Session State Initialization
 if "user_role" not in st.session_state:
@@ -152,7 +151,7 @@ if "audit_logs" not in st.session_state:
 
 # Sidebar - Matching Screenshot Layout
 with st.sidebar:
-    st.markdown("""
+    render_html("""
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
         <div style="width: 36px; height: 36px; background: #7c3aed; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 18px;">
             ✦
@@ -161,7 +160,7 @@ with st.sidebar:
             Robotech
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
     selected_role = st.selectbox(
         "Active Role Mode",
@@ -170,7 +169,7 @@ with st.sidebar:
     )
     st.session_state.user_role = selected_role
 
-    st.markdown("<hr style='margin: 15px 0; border: none; border-top: 1px solid #f1f5f9;'>", unsafe_allow_html=True)
+    render_html("<hr style='margin: 15px 0; border: none; border-top: 1px solid #f1f5f9;'>")
     
     if selected_role == "STUDENT":
         menu = st.radio("Navigation", [
@@ -187,14 +186,14 @@ with st.sidebar:
             "Permission Matrix (RBAC)", "Reports & CSV Export", "Audit Logs", "System Settings"
         ])
 
-    st.markdown("<hr style='margin: 15px 0; border: none; border-top: 1px solid #f1f5f9;'>", unsafe_allow_html=True)
+    render_html("<hr style='margin: 15px 0; border: none; border-top: 1px solid #f1f5f9;'>")
     
-    st.markdown("""
+    render_html("""
     <div style="padding: 10px 0; font-size: 12px; color: #64748b;">
         <div style="margin-bottom: 6px;">⚙️ <b>Settings</b></div>
         <div style="margin-bottom: 6px;">💬 <b>Support</b></div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
     
     if st.button("🚪 Sign Out", use_container_width=True):
         st.session_state.user_role = "STUDENT"
@@ -207,20 +206,20 @@ if selected_role == "STUDENT":
     # Top Header Bar matching screenshot
     col_h_left, col_h_mid, col_h_right = st.columns([4, 4, 4])
     with col_h_left:
-        st.markdown("""
+        render_html("""
         <div>
             <h1 style="font-size: 26px; font-weight: 900; color: #1e1b4b; margin: 0; line-height: 1.1;">Hello, Anna!</h1>
             <p style="font-size: 13px; color: #94a3b8; margin: 2px 0 0 0; font-weight: 500;">Have a good day!</p>
         </div>
-        """, unsafe_allow_html=True)
+        """)
     with col_h_mid:
-        st.markdown("""
+        render_html("""
         <div style="background: white; border-radius: 9999px; padding: 8px 18px; border: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8; display: flex; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
             🔍 Search assessments, roadmaps, mentors...
         </div>
-        """, unsafe_allow_html=True)
+        """)
     with col_h_right:
-        st.markdown("""
+        render_html("""
         <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px;">
             <div style="background: white; padding: 4px 12px 4px 6px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 8px;">
                 <div style="width: 30px; height: 30px; background: #fbbf24; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; color: #78350f;">
@@ -235,20 +234,20 @@ if selected_role == "STUDENT":
                 🔔
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
 
-    st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
+    render_html("<div style='height: 15px;'></div>")
 
     if menu == "Dashboard":
         # 3-Column Layout matching screenshot
-        col1, col2, col3 = st.columns([5, 3.5, 3.5])
+        col1, col2, col3 = st.columns([4.8, 3.6, 3.6])
 
         # -------------------------------------------------------------
         # COLUMN 1: Left (Hero Banner, Line Chart, Rating & Hours)
         # -------------------------------------------------------------
         with col1:
             # 1. Hero Banner Card
-            st.markdown("""
+            render_html("""
             <div class="hero-banner">
                 <div style="max-width: 60%;">
                     <div style="font-size: 11px; font-weight: 700; color: #e9d5ff; text-transform: uppercase; letter-spacing: 0.5px;">Masterclass</div>
@@ -260,16 +259,16 @@ if selected_role == "STUDENT":
                     💡👨‍💻
                 </div>
             </div>
-            """, unsafe_allow_html=True)
+            """)
 
             # 2. Progress Trajectory Line Chart
-            st.markdown("""
+            render_html("""
             <div class="soft-card">
                 <div class="widget-title">
                     <span style="font-weight: 800; color: #1e293b;">Progress <span style="font-size: 11px; font-weight: 600; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 10px;">• 2025 ▼</span></span>
                     <span style="color: #94a3b8;">•••</span>
                 </div>
-            """, unsafe_allow_html=True)
+            """)
 
             months = ["August", "September", "October", "November", "December", "January"]
             values = [8.0, 12.5, 18.0, 14.2, 19.5, 24.8]
@@ -293,12 +292,12 @@ if selected_role == "STUDENT":
                 paper_bgcolor="rgba(0,0,0,0)"
             )
             st.plotly_chart(fig_prog, use_container_width=True, config={"displayModeBar": False})
-            st.markdown("</div>", unsafe_allow_html=True)
+            render_html("</div>")
 
             # 3. Dual Mini Cards (Rating & Learning Hours)
             m_col1, m_col2 = st.columns(2)
             with m_col1:
-                st.markdown("""
+                render_html("""
                 <div class="soft-card">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="font-size: 12px; font-weight: 800; color: #1e293b;">Rating</span>
@@ -308,7 +307,7 @@ if selected_role == "STUDENT":
                         <span style="font-size: 26px; font-weight: 900; color: #0f172a;">8,5</span>
                         <span class="metric-badge-pink">+15% vs last week</span>
                     </div>
-                """, unsafe_allow_html=True)
+                """)
 
                 fig_spark = go.Figure(go.Scatter(
                     x=[1, 2, 3, 4, 5, 6, 7],
@@ -327,16 +326,16 @@ if selected_role == "STUDENT":
                     paper_bgcolor="rgba(0,0,0,0)"
                 )
                 st.plotly_chart(fig_spark, use_container_width=True, config={"displayModeBar": False})
-                st.markdown("</div>", unsafe_allow_html=True)
+                render_html("</div>")
 
             with m_col2:
-                st.markdown("""
+                render_html("""
                 <div class="soft-card">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="font-size: 12px; font-weight: 800; color: #1e293b;">Learning hours</span>
                         <span style="font-size: 9px; color: #94a3b8;">this week ▼</span>
                     </div>
-                """, unsafe_allow_html=True)
+                """)
 
                 days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
                 hours = [1.2, 1.8, 2.2, 1.5, 2.5, 0.8, 1.1]
@@ -356,20 +355,20 @@ if selected_role == "STUDENT":
                     paper_bgcolor="rgba(0,0,0,0)"
                 )
                 st.plotly_chart(fig_bar, use_container_width=True, config={"displayModeBar": False})
-                st.markdown("</div>", unsafe_allow_html=True)
+                render_html("</div>")
 
         # -------------------------------------------------------------
         # COLUMN 2: Center (Days Report Gauge, Teachers, Homework)
         # -------------------------------------------------------------
         with col2:
             # 1. Days Report Radial Gauge
-            st.markdown("""
+            render_html("""
             <div class="soft-card">
                 <div class="widget-title">
                     <span>Days report <span style="font-size: 10px; font-weight: 600; color: #94a3b8;">Month ▼</span></span>
                     <span style="color: #94a3b8;">•••</span>
                 </div>
-            """, unsafe_allow_html=True)
+            """)
 
             fig_gauge = go.Figure(go.Indicator(
                 mode="gauge+number",
@@ -388,16 +387,16 @@ if selected_role == "STUDENT":
                 paper_bgcolor="rgba(0,0,0,0)"
             )
             st.plotly_chart(fig_gauge, use_container_width=True, config={"displayModeBar": False})
-            st.markdown("""
+            render_html("""
                 <div style="display: flex; justify-content: center; gap: 15px; font-size: 10px; font-weight: 700; color: #64748b;">
                     <span><span style="color: #06b6d4;">●</span> Done</span>
                     <span><span style="color: #cbd5e1;">●</span> Progress</span>
                 </div>
             </div>
-            """, unsafe_allow_html=True)
+            """)
 
             # 2. Teachers / Mentors Card
-            st.markdown("""
+            render_html("""
             <div class="soft-card">
                 <div class="widget-title">
                     <span>Teachers</span>
@@ -444,10 +443,10 @@ if selected_role == "STUDENT":
                     <span style="font-size: 12px; color: #94a3b8; border: 1px solid #e2e8f0; border-radius: 6px; padding: 2px 6px;">✉️</span>
                 </div>
             </div>
-            """, unsafe_allow_html=True)
+            """)
 
             # 3. Homework / Milestones Card
-            st.markdown("""
+            render_html("""
             <div class="soft-card">
                 <div class="widget-title">
                     <span>Homework</span>
@@ -472,23 +471,23 @@ if selected_role == "STUDENT":
                     </div>
                 </div>
             </div>
-            """, unsafe_allow_html=True)
+            """)
 
         # -------------------------------------------------------------
         # COLUMN 3: Right (Mini-Calendar, Today's Schedule, Events)
         # -------------------------------------------------------------
         with col3:
-            # 1. Mini-Calendar Widget
-            st.markdown("""
+            # 1. Mini-Calendar & Today's Schedule Widget (Rendered cleanly as one consolidated card)
+            render_html("""
             <div class="soft-card">
                 <div class="widget-title">
                     <span>January 2025</span>
-                    <span style="color: #94a3b8; font-size: 11px;">⟨ ⟩</span>
+                    <span style="color: #94a3b8; font-size: 11px; cursor: pointer;">⟨ ⟩</span>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 9px; font-weight: 800; color: #94a3b8; margin-bottom: 6px;">
                     <div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div><div>S</div>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; font-weight: 700; color: #64748b; align-items: center;">
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; font-weight: 700; color: #64748b; align-items: center; margin-bottom: 12px;">
                     <div>16</div>
                     <div>17</div>
                     <div class="calendar-capsule">18</div>
@@ -497,38 +496,36 @@ if selected_role == "STUDENT":
                     <div class="calendar-capsule">21</div>
                     <div class="calendar-capsule">22</div>
                 </div>
-
-                <hr style="margin: 12px 0; border: none; border-top: 1px solid #f1f5f9;">
-
-                <div class="widget-title" style="margin-bottom: 6px;">
-                    <span style="font-size: 11px;">Today</span>
-                    <a href="#" class="widget-link" style="font-size: 10px;">see all</a>
-                </div>
-                <div style="font-size: 11px; margin-bottom: 6px;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="font-weight: 700; color: #1e293b;">📘 Book club & DSA</span>
-                        <span style="color: #94a3b8; font-size: 10px;">11:00 - 12:30</span>
+                <div style="border-top: 1px solid #f1f5f9; padding-top: 10px; margin-top: 5px;">
+                    <div class="widget-title" style="margin-bottom: 6px;">
+                        <span style="font-size: 11px;">Today</span>
+                        <a href="#" class="widget-link" style="font-size: 10px;">see all</a>
                     </div>
-                </div>
-                <div style="font-size: 11px; margin-bottom: 6px;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="font-weight: 700; color: #1e293b;">⚛️ Physics & Systems</span>
-                        <span style="color: #94a3b8; font-size: 10px;">14:30 - 15:30</span>
+                    <div style="font-size: 11px; margin-bottom: 6px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="font-weight: 700; color: #1e293b;">📘 Book club & DSA</span>
+                            <span style="color: #94a3b8; font-size: 10px;">11:00 - 12:30</span>
+                        </div>
                     </div>
-                </div>
-
-                <div style="font-size: 10px; font-weight: 700; color: #94a3b8; margin: 8px 0 4px 0;">Tomorrow</div>
-                <div style="font-size: 11px;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="font-weight: 700; color: #1e293b;">💻 C++ Speed Test</span>
-                        <span style="color: #94a3b8; font-size: 10px;">11:00 - 12:30</span>
+                    <div style="font-size: 11px; margin-bottom: 6px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="font-weight: 700; color: #1e293b;">⚛️ Physics & Systems</span>
+                            <span style="color: #94a3b8; font-size: 10px;">14:30 - 15:30</span>
+                        </div>
+                    </div>
+                    <div style="font-size: 10px; font-weight: 700; color: #94a3b8; margin: 8px 0 4px 0;">Tomorrow</div>
+                    <div style="font-size: 11px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="font-weight: 700; color: #1e293b;">💻 C++ Speed Test</span>
+                            <span style="color: #94a3b8; font-size: 10px;">11:00 - 12:30</span>
+                        </div>
                     </div>
                 </div>
             </div>
-            """, unsafe_allow_html=True)
+            """)
 
             # 2. Events Card
-            st.markdown("""
+            render_html("""
             <div class="soft-card">
                 <div class="widget-title">
                     <span>Events</span>
@@ -556,51 +553,51 @@ if selected_role == "STUDENT":
                     <span style="font-size: 12px; color: #94a3b8;">🎙️</span>
                 </div>
             </div>
-            """, unsafe_allow_html=True)
+            """)
 
     elif menu == "My Schedule" or menu == "Mock Tests":
         st.subheader("📅 Schedule & Placement Mock Tests")
-        st.markdown("""
+        render_html("""
         <div class="soft-card">
             <div style="font-size: 14px; font-weight: 800; color: #1e293b; margin-bottom: 8px;">Placement Tier-1 Simulation Schedule</div>
             <p style="font-size: 12px; color: #64748b;">Upcoming institutional simulation exams designed to assess full-stack coding, quantitative aptitude, and system design readiness.</p>
         </div>
-        """, unsafe_allow_html=True)
+        """)
         st.button("Start Full Placement Mock Simulation", type="primary")
 
     elif menu == "Projects & Assessments":
         st.subheader("💻 Assessments Catalog")
         a1, a2, a3 = st.columns(3)
         with a1:
-            st.markdown("""
+            render_html("""
             <div class="soft-card">
                 <div style="font-weight: 800; font-size: 14px; color: #1e293b;">DSA Core Assessment</div>
                 <div style="font-size: 11px; color: #94a3b8; margin: 4px 0 8px 0;">Medium • 45 Mins • Arrays & Hash Maps</div>
                 <span class="metric-badge-pink">Score: 85% (Passed)</span>
             </div>
-            """, unsafe_allow_html=True)
+            """)
         with a2:
-            st.markdown("""
+            render_html("""
             <div class="soft-card">
                 <div style="font-weight: 800; font-size: 14px; color: #1e293b;">Quantitative Speed Test</div>
                 <div style="font-size: 11px; color: #94a3b8; margin: 4px 0 8px 0;">Easy • 30 Mins • Speed Math & Logic</div>
                 <span class="metric-badge-pink">Score: 74% (Passed)</span>
             </div>
-            """, unsafe_allow_html=True)
+            """)
         with a3:
-            st.markdown("""
+            render_html("""
             <div class="soft-card">
                 <div style="font-weight: 800; font-size: 14px; color: #1e293b;">Placement Mock 2026</div>
                 <div style="font-size: 11px; color: #94a3b8; margin: 4px 0 8px 0;">Hard • 60 Mins • Full-Length Simulation</div>
                 <span class="metric-badge-pink">Score: 76% (Passed)</span>
             </div>
-            """, unsafe_allow_html=True)
+            """)
 
     elif menu == "Live Coding IDE":
         st.subheader("💻 Sandboxed Coding Assessment IDE")
         col_desc, col_editor = st.columns([1, 1])
         with col_desc:
-            st.markdown("""
+            render_html("""
             <div class="soft-card">
                 <div style="font-weight: 800; font-size: 14px; color: #1e293b;">Problem: Reverse Array In-Place</div>
                 <p style="font-size: 12px; color: #64748b; margin-top: 6px;">Given an array of integers <code>arr</code>, write a function to reverse the array in-place without using extra memory.</p>
@@ -608,7 +605,7 @@ if selected_role == "STUDENT":
                     <b>Example:</b> Input: [1, 2, 3, 4, 5] → Output: [5, 4, 3, 2, 1]
                 </div>
             </div>
-            """, unsafe_allow_html=True)
+            """)
         with col_editor:
             lang = st.selectbox("Language", ["Python 3", "JavaScript", "C++ 17", "Java 17"])
             starter = "def reverse_array(arr: list[int]) -> list[int]:\n    # Write your solution here\n    return arr[::-1]\n"
@@ -631,7 +628,7 @@ if selected_role == "STUDENT":
 
     elif menu == "Profile":
         st.subheader("👤 Student Profile")
-        st.markdown("""
+        render_html("""
         <div class="soft-card">
             <div style="font-weight: 800; font-size: 16px; color: #1e293b;">Anna Alekseeva</div>
             <div style="font-size: 12px; color: #64748b; margin: 4px 0 12px 0;">anna.alekseeva@institution.edu • Roll: 2022CSE101</div>
@@ -640,7 +637,7 @@ if selected_role == "STUDENT":
                 CGPA: 8.9 / 10.0 • Placement Readiness: <b>85%</b>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
 
 # ==========================================
 # FACULTY ROLE VIEWS
@@ -687,5 +684,5 @@ elif selected_role == "MANAGEMENT":
     ])
     st.dataframe(df_depts, use_container_width=True)
 
-st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
+render_html("<div style='height: 30px;'></div>")
 st.caption("Robotech • Placement Training Portal • University Edition")
