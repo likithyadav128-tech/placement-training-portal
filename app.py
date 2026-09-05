@@ -11,7 +11,7 @@ from typing import Optional, Dict, Any
 # ==============================================================================
 st.set_page_config(
     page_title="Placement Training Portal",
-    page_icon="🎓",
+    page_icon="??",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -19,7 +19,7 @@ st.set_page_config(
 def render_html(html_str: str):
     """
     Safely render HTML in Streamlit.
-    Strips all linebreaks and whitespace so Markdown parser NEVER triggers code block <pre><code> mode.
+    Strips all linebreaks and whitespace so Markdown parser NEVER triggers code block pre code mode.
     """
     cleaned_html = " ".join([line.strip() for line in html_str.splitlines() if line.strip()])
     st.markdown(cleaned_html, unsafe_allow_html=True)
@@ -31,13 +31,15 @@ render_html("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
     
-    html, body, [class*="css"] {
-        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-        color: #0f172a;
+    html, body, [class*="css"], .stApp {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        color: #0f172a !important;
+        background-color: #f1f5f9 !important;
     }
-    
-    .stApp {
-        background-color: #f1f5f9;
+
+    /* All standard text elements force high-contrast dark tones */
+    p, span, label, h1, h2, h3, h4, h5, h6, li, div {
+        color: #0f172a;
     }
 
     /* High Contrast Text Classes */
@@ -59,16 +61,16 @@ render_html("""
     /* Professional Card Containers */
     .saas-card {
         background: #ffffff;
-        border: 1px solid #cbd5e1;
+        border: 1.5px solid #cbd5e1;
         border-radius: 12px;
         padding: 24px;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
         margin-bottom: 16px;
     }
 
     .metric-container {
         background: #ffffff;
-        border: 1px solid #cbd5e1;
+        border: 1.5px solid #cbd5e1;
         border-radius: 12px;
         padding: 18px 20px;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.04);
@@ -76,7 +78,7 @@ render_html("""
 
     .metric-label {
         font-size: 12px;
-        font-weight: 700;
+        font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         color: #334155;
@@ -174,13 +176,132 @@ render_html("""
     }
     .step-active { background: #1d4ed8; color: #ffffff; }
     .step-done { background: #059669; color: #ffffff; }
+
+    /* Streamlit Alert Widgets (High Contrast Dark Text) */
+    .stAlert {
+        border-radius: 10px !important;
+        padding: 14px 18px !important;
+        margin: 12px 0 !important;
+    }
+    div[data-testid="stAlert"] * {
+        color: #0f172a !important;
+        font-weight: 700 !important;
+    }
+    div[data-baseweb="notification"] {
+        background-color: #fef3c7 !important;
+        border: 1.5px solid #f59e0b !important;
+        border-radius: 10px !important;
+    }
+    div[data-baseweb="notification"] * {
+        color: #78350f !important;
+        font-weight: 700 !important;
+    }
+
+    /* Streamlit Expander Widgets */
+    [data-testid="stExpander"] {
+        background-color: #ffffff !important;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 12px !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+        margin-top: 14px !important;
+        overflow: hidden !important;
+    }
+    [data-testid="stExpander"] details {
+        background-color: #ffffff !important;
+    }
+    [data-testid="stExpander"] summary {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        font-weight: 800 !important;
+        font-size: 13.5px !important;
+        padding: 12px 16px !important;
+    }
+    [data-testid="stExpander"] summary:hover {
+        background-color: #f8fafc !important;
+        color: #1d4ed8 !important;
+    }
+    [data-testid="stExpander"] summary svg, [data-testid="stExpander"] summary p, [data-testid="stExpander"] summary span {
+        color: #0f172a !important;
+        fill: #0f172a !important;
+        font-weight: 800 !important;
+    }
+    [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
+        background-color: #ffffff !important;
+        padding: 16px 20px !important;
+        border-top: 1px solid #e2e8f0 !important;
+    }
+    [data-testid="stExpander"] [data-testid="stExpanderDetails"] * {
+        color: #0f172a !important;
+    }
+
+    /* Form Controls & Selectboxes */
+    label, [data-testid="stWidgetLabel"] p, [data-testid="stWidgetLabel"] span {
+        color: #0f172a !important;
+        font-weight: 800 !important;
+        font-size: 13px !important;
+    }
+    div[data-baseweb="select"] > div {
+        background-color: #ffffff !important;
+        border: 1.5px solid #94a3b8 !important;
+        border-radius: 8px !important;
+    }
+    div[data-baseweb="select"] * {
+        color: #0f172a !important;
+        font-weight: 700 !important;
+    }
+    div[data-baseweb="popover"] ul, div[data-baseweb="popover"] li {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+    }
+
+    /* Buttons */
+    .stButton > button {
+        font-weight: 800 !important;
+        font-size: 14px !important;
+        border-radius: 8px !important;
+        padding: 10px 20px !important;
+        letter-spacing: 0.3px !important;
+        transition: all 0.2s ease !important;
+    }
+    .stButton > button[kind="primary"] {
+        background-color: #0f172a !important;
+        color: #ffffff !important;
+        border: 1.5px solid #0f172a !important;
+    }
+    .stButton > button[kind="primary"]:hover {
+        background-color: #1e293b !important;
+        border-color: #1e293b !important;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
+    }
+    .stButton > button[kind="secondary"] {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        border: 1.5px solid #94a3b8 !important;
+    }
+    .stButton > button[kind="secondary"]:hover {
+        background-color: #f1f5f9 !important;
+        border-color: #475569 !important;
+        color: #0f172a !important;
+    }
+
+    /* Modern Border Containers (st.container(border=True)) */
+    [data-testid="stVerticalBlockBorderWrapper"] > div {
+        background-color: #ffffff !important;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 14px !important;
+        padding: 28px !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+    }
 </style>
 """)
 
 # ==============================================================================
-# 3. DATABASE USER REGISTRY & REPOSITORY
+# 3. DATABASE USER REGISTRY & REPOSITORY (MICROSOFT & GOOGLE SSO)
 # ==============================================================================
 INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
+    # -------------------------------------------------------------------------
+    # STUDENTS (ACTIVE, INACTIVE, BLOCKED, PENDING)
+    # -------------------------------------------------------------------------
     "likith@college.edu": {
         "id": "STU001",
         "name": "Likith Yadav",
@@ -193,10 +314,34 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "cgpa": 8.9,
         "overall_score": 82
     },
+    "likith.yadav@gmail.com": {
+        "id": "STU001",
+        "name": "Likith Yadav",
+        "email": "likith.yadav@gmail.com",
+        "role": "STUDENT",
+        "status": "ACTIVE",
+        "department": "Computer Science & Engineering",
+        "year": 4,
+        "section": "A",
+        "cgpa": 8.9,
+        "overall_score": 82
+    },
     "rohan.verma@institution.edu": {
         "id": "STU002",
         "name": "Rohan Verma",
         "email": "rohan.verma@institution.edu",
+        "role": "STUDENT",
+        "status": "ACTIVE",
+        "department": "Computer Science & Engineering",
+        "year": 4,
+        "section": "A",
+        "cgpa": 8.8,
+        "overall_score": 78
+    },
+    "student.google@gmail.com": {
+        "id": "STU002",
+        "name": "Rohan Verma",
+        "email": "student.google@gmail.com",
         "role": "STUDENT",
         "status": "ACTIVE",
         "department": "Computer Science & Engineering",
@@ -277,10 +422,23 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "cgpa": 7.9,
         "overall_score": 62
     },
+
+    # -------------------------------------------------------------------------
+    # FACULTY (MICROSOFT & GOOGLE ACCOUNTS)
+    # -------------------------------------------------------------------------
     "faculty@college.edu": {
         "id": "FAC101",
         "name": "Prof. Arvind Sharma",
         "email": "faculty@college.edu",
+        "role": "FACULTY",
+        "status": "ACTIVE",
+        "department": "Computer Science & Engineering",
+        "title": "Professor & Placement Coordinator"
+    },
+    "faculty.google@gmail.com": {
+        "id": "FAC101",
+        "name": "Prof. Arvind Sharma",
+        "email": "faculty.google@gmail.com",
         "role": "FACULTY",
         "status": "ACTIVE",
         "department": "Computer Science & Engineering",
@@ -304,10 +462,23 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "department": "Electronics & Communication",
         "title": "Associate Professor"
     },
+
+    # -------------------------------------------------------------------------
+    # MANAGEMENT (MICROSOFT & GOOGLE ACCOUNTS)
+    # -------------------------------------------------------------------------
     "admin@college.edu": {
         "id": "MGT001",
         "name": "Dr. Rajeshwar Rao",
         "email": "admin@college.edu",
+        "role": "MANAGEMENT",
+        "status": "ACTIVE",
+        "department": "Institutional Governance",
+        "title": "Dean of Placements & Training"
+    },
+    "admin.google@gmail.com": {
+        "id": "MGT001",
+        "name": "Dr. Rajeshwar Rao",
+        "email": "admin.google@gmail.com",
         "role": "MANAGEMENT",
         "status": "ACTIVE",
         "department": "Institutional Governance",
@@ -333,13 +504,13 @@ def lookup_user_in_database(email: Optional[str]) -> Optional[Dict[str, Any]]:
 # Session State & Audit Logs
 if "audit_logs" not in st.session_state:
     st.session_state.audit_logs = [
-        {"timestamp": "2026-09-05 10:30:15", "user": "admin@college.edu", "role": "MANAGEMENT", "action": "INITIALIZE_SYSTEM", "target": "SYSTEM #1", "details": "Configured Microsoft Entra ID OpenID Connect Authentication"},
+        {"timestamp": "2026-09-05 10:30:15", "user": "admin@college.edu", "role": "MANAGEMENT", "action": "INITIALIZE_SYSTEM", "target": "SYSTEM #1", "details": "Configured Microsoft Entra ID & Google SSO Authentication"},
         {"timestamp": "2026-09-05 11:15:22", "user": "admin@college.edu", "role": "MANAGEMENT", "action": "CREATE_ASSESSMENT", "target": "ASSESSMENT #1", "details": "Published DSA Core Assessment"},
         {"timestamp": "2026-09-05 11:45:00", "user": "admin@college.edu", "role": "MANAGEMENT", "action": "GRANT_PERMISSION", "target": "faculty@college.edu", "details": "Granted MANAGE_ASSESSMENTS override to Faculty Lead"}
     ]
 
 # ==============================================================================
-# 4. AUTHENTICATION ENGINE (NATIVE STREAMLIT AUTH & ENTRA ID)
+# 4. AUTHENTICATION ENGINE (NATIVE STREAMLIT AUTH & ENTRA ID / GOOGLE OIDC)
 # ==============================================================================
 def get_authenticated_identity() -> Optional[Dict[str, Any]]:
     """Retrieve identity from Streamlit's native st.user or session state."""
@@ -353,7 +524,7 @@ def get_authenticated_identity() -> Optional[Dict[str, Any]]:
     except Exception:
         pass
 
-    # 2. Check session state simulated login (for development when Azure Entra secrets not yet configured locally)
+    # 2. Check session state simulated login (for development or when SSO secrets not yet configured locally)
     if "authenticated_user_email" in st.session_state and st.session_state.authenticated_user_email:
         return {
             "email": st.session_state.authenticated_user_email,
@@ -368,6 +539,8 @@ def perform_logout():
         del st.session_state["authenticated_user_email"]
     if "authenticated_user_name" in st.session_state:
         del st.session_state["authenticated_user_name"]
+    if "login_notice" in st.session_state:
+        del st.session_state["login_notice"]
     
     try:
         if hasattr(st, "logout"):
@@ -379,10 +552,10 @@ def perform_logout():
 current_identity = get_authenticated_identity()
 
 # ==============================================================================
-# 5. LOGIN VIEW (HIGH-CONTRAST DARK TEXT & PURE HTML RENDERING)
+# 5. LOGIN VIEW (HIGH-CONTRAST DARK TEXT, MICROSOFT & GOOGLE SSO)
 # ==============================================================================
 if not current_identity:
-    st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
     
     col_left, col_mid_space, col_right = st.columns([1.2, 0.1, 1.1])
     
@@ -391,95 +564,141 @@ if not current_identity:
     # -------------------------------------------------------------------------
     with col_left:
         render_html("""
-        <div style="padding: 24px 10px;">
-            <div style="width: 48px; height: 48px; background: #0f172a; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 24px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(15,23,42,0.2);">
-                🎓
+        <div style="padding: 20px 10px;">
+            <div style="width: 52px; height: 52px; background: #0f172a; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 26px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(15,23,42,0.25);">
+                ??
             </div>
             <div style="font-size: 13px; font-weight: 800; color: #1d4ed8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
                 Institutional Placement System
             </div>
-            <h1 style="font-size: 38px; font-weight: 900; color: #0f172a; line-height: 1.15; margin: 0 0 16px 0; letter-spacing: -0.5px;">
+            <h1 style="font-size: 40px; font-weight: 900; color: #0f172a; line-height: 1.15; margin: 0 0 16px 0; letter-spacing: -0.5px;">
                 PLACEMENT<br>TRAINING<br>PORTAL
             </h1>
-            <div style="font-size: 17px; font-weight: 800; color: #1e3a8a; margin-bottom: 12px;">
+            <div style="font-size: 18px; font-weight: 800; color: #1e3a8a; margin-bottom: 12px;">
                 Prepare smarter. Perform better. Get placement ready.
             </div>
-            <p style="font-size: 14px; color: #334155; line-height: 1.6; max-width: 460px; margin-bottom: 24px; font-weight: 500;">
-                Personalized placement preparation, assessments, performance insights, and career readiness in one unified platform.
+            <p style="font-size: 14.5px; color: #334155; line-height: 1.65; max-width: 460px; margin-bottom: 24px; font-weight: 600;">
+                Personalized placement preparation, assessments, performance insights, and career readiness in one unified institutional platform.
             </p>
-            <div style="display: flex; gap: 20px; font-size: 13px; color: #0f172a; font-weight: 700; border-top: 2px solid #cbd5e1; padding-top: 18px;">
-                <div>🔒 Microsoft Entra ID Protected</div>
-                <div>🛡️ Granular Institutional RBAC</div>
+            <div style="display: flex; gap: 20px; font-size: 13px; color: #0f172a; font-weight: 800; border-top: 2px solid #cbd5e1; padding-top: 18px;">
+                <div>?? Microsoft & Google SSO</div>
+                <div>??? Granular Institutional RBAC</div>
             </div>
         </div>
         """)
 
     # -------------------------------------------------------------------------
-    # RIGHT LOGIN CARD (CRISP WHITE CARD WITH BOLD DARK TEXT)
+    # RIGHT LOGIN CARD (UNIFIED WHITE CARD WITH HIGH CONTRAST DARK TEXT)
     # -------------------------------------------------------------------------
     with col_right:
-        render_html("""
-        <div class="saas-card" style="padding: 36px 32px; max-width: 440px; margin: 0 auto; border: 1px solid #cbd5e1; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
-            <h2 style="font-size: 26px; font-weight: 900; color: #0f172a; margin: 0 0 8px 0;">Welcome Back</h2>
-            <p style="font-size: 14px; color: #334155; margin: 0 0 24px 0; font-weight: 600;">
-                Sign in to access your placement training portal.
-            </p>
-        </div>
-        """)
+        with st.container(border=True):
+            render_html("""
+            <div style="margin-bottom: 20px;">
+                <h2 style="font-size: 26px; font-weight: 900; color: #0f172a; margin: 0 0 6px 0;">Welcome Back</h2>
+                <p style="font-size: 14px; color: #334155; margin: 0; font-weight: 600;">
+                    Sign in with your institutional account to access your placement training portal.
+                </p>
+            </div>
+            """)
 
-        # Official Microsoft Entra ID Login Button
-        login_btn_clicked = st.button(
-            "⊞  Continue with Microsoft",
-            use_container_width=True,
-            type="primary"
-        )
+            # 1. Microsoft SSO Button
+            ms_clicked = st.button(
+                "?  Continue with Microsoft",
+                use_container_width=True,
+                type="primary",
+                key="btn_ms_sso"
+            )
 
-        if login_btn_clicked:
-            # 1. Attempt native Streamlit st.login("microsoft") if configured
-            try:
-                if hasattr(st, "login"):
-                    st.login("microsoft")
-                else:
-                    st.session_state.authenticated_user_email = "likith@college.edu"
-                    st.session_state.authenticated_user_name = "Likith Yadav"
+            # 2. Google SSO Button
+            google_clicked = st.button(
+                "??  Continue with Google",
+                use_container_width=True,
+                type="secondary",
+                key="btn_google_sso"
+            )
+
+            if ms_clicked:
+                try:
+                    if hasattr(st, "login"):
+                        st.login("microsoft")
+                    else:
+                        st.session_state.authenticated_user_email = "likith@college.edu"
+                        st.session_state.authenticated_user_name = "Likith Yadav"
+                        st.rerun()
+                except Exception as e:
+                    st.session_state.login_notice = f"Microsoft Entra ID is not yet connected in secrets.toml: {e}"
                     st.rerun()
-            except Exception as e:
-                st.warning(f"Microsoft Entra ID not configured in secrets.toml: {e}. Use fast institutional testing below:")
 
-        render_html("""
-        <div style="max-width: 440px; margin: 10px auto 0 auto; text-align: center;">
-            <div style="font-size: 13px; color: #1e293b; font-weight: 700; margin-bottom: 16px;">
-                Use your registered college Microsoft account.
-            </div>
-            <div style="border-top: 1px solid #cbd5e1; padding-top: 14px; font-size: 12px; color: #475569; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                <span>🔒</span>
-                <span>Secure authentication powered by Microsoft Entra ID</span>
-            </div>
-        </div>
-        """)
+            if google_clicked:
+                try:
+                    if hasattr(st, "login"):
+                        st.login("google")
+                    else:
+                        st.session_state.authenticated_user_email = "likith.yadav@gmail.com"
+                        st.session_state.authenticated_user_name = "Likith Yadav"
+                        st.rerun()
+                except Exception as e:
+                    st.session_state.login_notice = f"Google Workspace SSO is not yet connected in secrets.toml: {e}"
+                    st.rerun()
 
-        # Fast Institutional Testing Switcher for Development
-        with st.expander("🛠️ Institutional Microsoft Account Simulator (Dev Mode)"):
-            st.markdown("<span style='font-size: 12px; color: #0f172a; font-weight: 700;'>Simulates authentication from different institutional accounts to verify database-driven role resolution:</span>", unsafe_allow_html=True)
-            
-            test_acc = st.selectbox("Select Authenticated Microsoft Identity", [
-                "likith@college.edu (STUDENT - Active)",
-                "rohan.verma@institution.edu (STUDENT - Active)",
-                "siddharth.gupta@institution.edu (STUDENT - At Risk)",
-                "inactive.student@institution.edu (STUDENT - Inactive)",
-                "blocked.student@institution.edu (STUDENT - Blocked)",
-                "pending.student@institution.edu (STUDENT - Pending)",
-                "faculty@college.edu (FACULTY - Placement Lead)",
-                "admin@college.edu (MANAGEMENT - Dean)",
-                "unknown.user@external.com (UNREGISTERED MICROSOFT ACCOUNT)"
-            ])
-            
-            if st.button("Simulate Microsoft Sign In"):
-                email = test_acc.split(" ")[0]
-                name = email.split("@")[0].replace(".", " ").title()
-                st.session_state.authenticated_user_email = email
-                st.session_state.authenticated_user_name = name
-                st.rerun()
+            # High-contrast custom warning banner when SSO credentials are not yet set
+            if st.session_state.get("login_notice"):
+                notice_msg = st.session_state.login_notice
+                render_html(f"""
+                <div style="background-color: #fef3c7; border: 1.5px solid #f59e0b; border-radius: 8px; padding: 12px 16px; margin: 14px 0; color: #78350f; font-size: 13px; font-weight: 700; line-height: 1.5;">
+                    ?? <b>SSO Provider Notice:</b><br>{notice_msg}<br>
+                    <span style="font-weight: 800; color: #92400e; margin-top: 4px; display: inline-block;">?? Use the <b>Institutional SSO Account Simulator</b> below for instant testing.</span>
+                </div>
+                """)
+
+            render_html("""
+            <div style="text-align: center; margin: 14px 0 10px 0;">
+                <div style="font-size: 13px; color: #1e293b; font-weight: 800; margin-bottom: 12px;">
+                    Use your registered college Microsoft or Google account.
+                </div>
+                <div style="border-top: 1px solid #cbd5e1; padding-top: 12px; font-size: 12px; color: #334155; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <span>??</span>
+                    <span>Secure SSO powered by Microsoft Entra ID & Google Workspace</span>
+                </div>
+            </div>
+            """)
+
+            # Fast Institutional Testing Switcher for Development / Instant Testing
+            with st.expander("??? Institutional SSO Account Simulator (Dev Mode)", expanded=False):
+                render_html("""
+                <div style="font-size: 12.5px; color: #0f172a; font-weight: 700; margin-bottom: 8px;">
+                    Simulate authentication from different institutional accounts to test RBAC authorization:
+                </div>
+                """)
+                
+                test_acc = st.selectbox(
+                    "Select Institutional Identity",
+                    [
+                        "likith@college.edu (STUDENT - Active, Microsoft)",
+                        "likith.yadav@gmail.com (STUDENT - Active, Google)",
+                        "rohan.verma@institution.edu (STUDENT - Active, Microsoft)",
+                        "student.google@gmail.com (STUDENT - Active, Google)",
+                        "siddharth.gupta@institution.edu (STUDENT - At Risk)",
+                        "inactive.student@institution.edu (STUDENT - Inactive Status)",
+                        "blocked.student@institution.edu (STUDENT - Access Blocked)",
+                        "pending.student@institution.edu (STUDENT - Verification Pending)",
+                        "faculty@college.edu (FACULTY - Placement Coordinator, Microsoft)",
+                        "faculty.google@gmail.com (FACULTY - Prof. Arvind Sharma, Google)",
+                        "admin@college.edu (MANAGEMENT - Dean of Placements, Microsoft)",
+                        "admin.google@gmail.com (MANAGEMENT - Institutional Governance, Google)",
+                        "unregistered.user@external.com (UNREGISTERED SSO ACCOUNT)"
+                    ],
+                    key="dev_sso_select"
+                )
+                
+                if st.button("Simulate SSO Sign In", use_container_width=True, key="btn_sim_sso"):
+                    email = test_acc.split(" ")[0].strip()
+                    name = email.split("@")[0].replace(".", " ").title()
+                    st.session_state.authenticated_user_email = email
+                    st.session_state.authenticated_user_name = name
+                    if "login_notice" in st.session_state:
+                        del st.session_state["login_notice"]
+                    st.rerun()
 
     st.stop()
 
@@ -489,7 +708,7 @@ if not current_identity:
 auth_email = current_identity.get("email", "").strip().lower()
 user_record = lookup_user_in_database(auth_email)
 
-# CASE 1: Unknown / Unregistered Microsoft Account
+# CASE 1: Unknown / Unregistered SSO Account
 if not user_record:
     st.markdown("<div style='height: 50px;'></div>", unsafe_allow_html=True)
     col_e1, col_e2, col_e3 = st.columns([1, 2, 1])
@@ -499,7 +718,7 @@ if not user_record:
             <div style="font-size: 36px; margin-bottom: 12px;">🚫</div>
             <h3 style="font-size: 22px; font-weight: 900; color: #0f172a; margin: 0 0 8px 0;">Account Not Registered</h3>
             <p style="font-size: 14px; color: #1e293b; line-height: 1.5; margin-bottom: 20px; font-weight: 600;">
-                Your Microsoft account (<b>{auth_email}</b>) was successfully authenticated, but it is not registered in the Placement Training Portal.
+                Your institutional account (<b>{auth_email}</b>) was successfully authenticated, but it is not registered in the Placement Training Portal.
             </p>
             <p style="font-size: 13px; color: #475569; margin-bottom: 24px; font-weight: 500;">
                 Please contact your college placement cell coordinator or administration to provision your student or faculty profile.
