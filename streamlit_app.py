@@ -6,175 +6,225 @@ import time
 import textwrap
 from datetime import datetime
 
-# Configure Page
+# ==============================================================================
+# 1. PAGE CONFIGURATION
+# ==============================================================================
 st.set_page_config(
-    page_title="Robotech • Placement Training Portal",
+    page_title="Placement Training Portal",
     page_icon="🎓",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
+# ==============================================================================
+# 2. DESIGN SYSTEM & REUSABLE UI HELPERS
+# ==============================================================================
 def render_html(html_str: str):
-    """Helper to render dedented HTML safely in Streamlit without markdown code block triggers."""
+    """Safely render dedented HTML strings in Streamlit."""
     st.markdown(textwrap.dedent(html_str).strip(), unsafe_allow_html=True)
 
-# Custom Styling (Pastel Lavender Glassmorphic Aesthetic matching screenshot)
+# Enterprise SaaS CSS Theme
 render_html("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
     
     html, body, [class*="css"] {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
     .stApp {
-        background-color: #ECE7F6;
-        background-image: 
-            radial-gradient(circle at 10% 10%, rgba(254, 215, 170, 0.3) 0%, transparent 40%),
-            radial-gradient(circle at 90% 90%, rgba(216, 180, 254, 0.35) 0%, transparent 45%);
+        background-color: #f8fafc;
     }
 
-    /* Card Containers */
-    .soft-card {
+    /* Professional Metric Cards */
+    .saas-card {
         background: #ffffff;
-        border-radius: 1.5rem;
-        padding: 1.25rem;
-        box-shadow: 0 4px 20px -2px rgba(124, 58, 237, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
-        border: 1px solid rgba(241, 245, 249, 0.9);
-        margin-bottom: 1.25rem;
-    }
-
-    .hero-banner {
-        background: linear-gradient(135deg, #8E7CC3 0%, #7B69B3 50%, #6856A1 100%);
-        border-radius: 1.5rem;
-        padding: 1.5rem;
-        color: #ffffff;
-        position: relative;
-        overflow: hidden;
-        margin-bottom: 1.25rem;
-        box-shadow: 0 10px 25px -3px rgba(124, 58, 237, 0.2);
-    }
-
-    .hero-btn {
-        background: #ffffff;
-        color: #1e293b;
-        font-weight: 700;
-        font-size: 0.8rem;
-        padding: 0.5rem 1.1rem;
-        border-radius: 9999px;
-        display: inline-block;
-        text-decoration: none;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        margin-top: 0.5rem;
-    }
-
-    .hero-btn:hover {
-        background: #f8fafc;
-        color: #0f172a;
-    }
-
-    .metric-badge-pink {
-        background: #fff1f2;
-        color: #f43f5e;
-        font-size: 0.7rem;
-        font-weight: 700;
-        padding: 2px 8px;
-        border-radius: 6px;
-    }
-
-    .widget-title {
-        font-weight: 800;
-        font-size: 0.95rem;
-        color: #1e293b;
-        margin-bottom: 0.75rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .widget-link {
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: #94a3b8;
-        text-decoration: none;
-    }
-
-    .widget-link:hover {
-        color: #7c3aed;
-    }
-
-    .teacher-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0.4rem 0;
-        border-bottom: 1px solid #f8fafc;
-    }
-
-    .teacher-avatar {
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        object-fit: cover;
-        margin-right: 10px;
-    }
-
-    .calendar-capsule {
-        background: #ede9fe;
-        color: #5b21b6;
-        font-weight: 700;
+        border: 1px solid #e2e8f0;
         border-radius: 12px;
-        padding: 4px;
-        text-align: center;
+        padding: 20px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+        margin-bottom: 16px;
+    }
+
+    .metric-container {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px 20px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+    }
+
+    .metric-label {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #64748b;
+        margin-bottom: 4px;
+    }
+
+    .metric-value {
+        font-size: 28px;
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1.1;
+    }
+
+    .metric-subtext {
+        font-size: 11px;
+        font-weight: 600;
+        margin-top: 6px;
+    }
+
+    .subtext-positive { color: #059669; }
+    .subtext-neutral { color: #64748b; }
+    .subtext-warning { color: #d97706; }
+
+    /* Recommended Next Step Banner */
+    .rec-banner {
+        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        color: #ffffff;
+        border-radius: 12px;
+        padding: 22px 26px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px -2px rgba(30, 58, 138, 0.25);
+    }
+
+    .rec-badge {
+        background: rgba(255, 255, 255, 0.15);
+        color: #93c5fd;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+
+    /* Badges */
+    .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+    .badge-success { background: #dcfce7; color: #15803d; }
+    .badge-warning { background: #fef3c7; color: #b45309; }
+    .badge-danger { background: #fee2e2; color: #b91c1c; }
+    .badge-info { background: #dbeafe; color: #1d4ed8; }
+
+    /* Activity Row */
+    .activity-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+
+    /* Timeline Step */
+    .timeline-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 14px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .timeline-item:last-child {
+        border-bottom: none;
+    }
+
+    .step-number {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        color: #475569;
+        font-weight: 700;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .step-active {
+        background: #2563eb;
+        color: #ffffff;
+    }
+
+    .step-done {
+        background: #10b981;
+        color: #ffffff;
     }
 </style>
 """)
 
-# Session State Initialization
+# ==============================================================================
+# 3. STATE INITIALIZATION & DATA LAYER
+# ==============================================================================
 if "user_role" not in st.session_state:
     st.session_state.user_role = "STUDENT"
+
 if "student_scores" not in st.session_state:
     st.session_state.student_scores = {
         "overall": 78,
         "coding": 82,
         "aptitude": 74,
-        "technical": 72,
         "mock": 76,
-        "rating": 8.5
+        "technical": 72,
+        "verbal": 80
     }
+
+if "active_student_view" not in st.session_state:
+    st.session_state.active_student_view = "2022CSE101"
+
 if "audit_logs" not in st.session_state:
     st.session_state.audit_logs = [
-        {"timestamp": "2026-09-05 10:30:15", "user": "admin@institution.edu", "role": "MANAGEMENT", "action": "INITIALIZE_SYSTEM", "target": "SYSTEM #1", "details": "Initialized portal configuration"},
-        {"timestamp": "2026-09-05 11:15:22", "user": "admin@institution.edu", "role": "MANAGEMENT", "action": "CREATE_ASSESSMENT", "target": "ASSESSMENT #1", "details": "Published DSA Core Assessment"},
-        {"timestamp": "2026-09-05 11:45:00", "user": "admin@institution.edu", "role": "MANAGEMENT", "action": "GRANT_PERMISSION", "target": "USER #2", "details": "Granted MANAGE_ASSESSMENTS override to Faculty"}
+        {"timestamp": "2026-09-05 10:30:15", "user": "admin@institution.edu", "role": "MANAGEMENT", "action": "INITIALIZE_SYSTEM", "target": "SYSTEM #1", "details": "Initialized portal placement readiness configuration"},
+        {"timestamp": "2026-09-05 11:15:22", "user": "admin@institution.edu", "role": "MANAGEMENT", "action": "CREATE_ASSESSMENT", "target": "ASSESSMENT #1", "details": "Published DSA Core Assessment (Medium, 45 Mins)"},
+        {"timestamp": "2026-09-05 11:45:00", "user": "admin@institution.edu", "role": "MANAGEMENT", "action": "GRANT_PERMISSION", "target": "Prof. Arvind Sharma", "details": "Granted MANAGE_ASSESSMENTS override to Faculty Coordinator"}
     ]
 
-# Sidebar - Matching Screenshot Layout
+# ==============================================================================
+# 4. SIDEBAR NAVIGATION
+# ==============================================================================
 with st.sidebar:
     render_html("""
-    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-        <div style="width: 36px; height: 36px; background: #7c3aed; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 18px;">
-            ✦
-        </div>
-        <div style="font-weight: 900; font-size: 20px; color: #1e1b4b; letter-spacing: -0.5px;">
-            Robotech
+    <div style="padding: 6px 0 16px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; background: #1e3a8a; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 16px;">
+                🎓
+            </div>
+            <div>
+                <div style="font-weight: 800; font-size: 15px; color: #0f172a; line-height: 1.2;">Placement Portal</div>
+                <div style="font-size: 11px; color: #64748b; font-weight: 500;">Prepare smarter. Perform better.</div>
+            </div>
         </div>
     </div>
     """)
 
+    # Active Role Selector
     selected_role = st.selectbox(
-        "Active Role Mode",
+        "Current Active Role",
         ["STUDENT", "FACULTY", "MANAGEMENT"],
         index=["STUDENT", "FACULTY", "MANAGEMENT"].index(st.session_state.user_role)
     )
     st.session_state.user_role = selected_role
 
-    render_html("<hr style='margin: 15px 0; border: none; border-top: 1px solid #f1f5f9;'>")
-    
+    st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+
+    # Role-Specific Navigation Menu (Strict RBAC Separation)
     if selected_role == "STUDENT":
-        menu = st.radio("Navigation", [
-            "Dashboard", "My Schedule", "Message", "Projects & Assessments", 
-            "Grades & Performance", "Live Coding IDE", "Mock Tests", "Profile"
+        menu = st.radio("Student Menu", [
+            "Dashboard", "My Performance", "Assessments", "Mock Tests", 
+            "My Roadmap", "Analysis & Suggestions", "Profile"
         ])
     elif selected_role == "FACULTY":
         menu = st.radio("Faculty Menu", [
@@ -186,503 +236,763 @@ with st.sidebar:
             "Permission Matrix (RBAC)", "Reports & CSV Export", "Audit Logs", "System Settings"
         ])
 
-    render_html("<hr style='margin: 15px 0; border: none; border-top: 1px solid #f1f5f9;'>")
-    
-    render_html("""
-    <div style="padding: 10px 0; font-size: 12px; color: #64748b;">
-        <div style="margin-bottom: 6px;">⚙️ <b>Settings</b></div>
-        <div style="margin-bottom: 6px;">💬 <b>Support</b></div>
+    st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
+    st.markdown("---")
+
+    # Authenticated User Badge & Logout
+    if selected_role == "STUDENT":
+        u_name, u_email, u_detail = "Rohan Verma", "rohan.verma@institution.edu", "CSE • Year 4"
+    elif selected_role == "FACULTY":
+        u_name, u_email, u_detail = "Prof. Arvind Sharma", "prof.sharma@institution.edu", "CSE Placement Lead"
+    else:
+        u_name, u_email, u_detail = "Dr. Rajeshwar Rao", "admin@institution.edu", "Dean of Placements"
+
+    render_html(f"""
+    <div style="padding: 10px 0; font-size: 12px; color: #475569;">
+        <div style="font-weight: 700; color: #0f172a;">{u_name}</div>
+        <div style="font-size: 11px; color: #64748b;">{u_email}</div>
+        <div style="font-size: 10px; color: #2563eb; font-weight: 600; margin-top: 2px;">{u_detail}</div>
     </div>
     """)
-    
-    if st.button("🚪 Sign Out", use_container_width=True):
+
+    if st.button("🚪 Sign Out / Switch Role", use_container_width=True):
         st.session_state.user_role = "STUDENT"
         st.rerun()
 
-# ==========================================
-# STUDENT ROLE VIEWS
-# ==========================================
+# ==============================================================================
+# 5. STUDENT VIEWS
+# ==============================================================================
 if selected_role == "STUDENT":
-    # Top Header Bar matching screenshot
-    col_h_left, col_h_mid, col_h_right = st.columns([4, 4, 4])
-    with col_h_left:
-        render_html("""
-        <div>
-            <h1 style="font-size: 26px; font-weight: 900; color: #1e1b4b; margin: 0; line-height: 1.1;">Hello, Anna!</h1>
-            <p style="font-size: 13px; color: #94a3b8; margin: 2px 0 0 0; font-weight: 500;">Have a good day!</p>
-        </div>
-        """)
-    with col_h_mid:
-        render_html("""
-        <div style="background: white; border-radius: 9999px; padding: 8px 18px; border: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8; display: flex; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
-            🔍 Search assessments, roadmaps, mentors...
-        </div>
-        """)
-    with col_h_right:
-        render_html("""
-        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px;">
-            <div style="background: white; padding: 4px 12px 4px 6px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 8px;">
-                <div style="width: 30px; height: 30px; background: #fbbf24; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; color: #78350f;">
-                    AA
-                </div>
-                <div style="text-align: left; line-height: 1.1;">
-                    <div style="font-weight: 800; font-size: 12px; color: #1e1b4b;">Anna Alekseeva</div>
-                    <div style="font-size: 10px; color: #94a3b8;">Pupil</div>
-                </div>
-            </div>
-            <div style="width: 38px; height: 38px; background: white; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 14px;">
-                🔔
-            </div>
-        </div>
-        """)
-
-    render_html("<div style='height: 15px;'></div>")
-
     if menu == "Dashboard":
-        # 3-Column Layout matching screenshot
-        col1, col2, col3 = st.columns([4.8, 3.6, 3.6])
+        # Greeting Header
+        st.title("Good morning, Rohan Verma")
+        st.caption("Here's your placement preparation progress • Department of Computer Science & Engineering")
 
-        # -------------------------------------------------------------
-        # COLUMN 1: Left (Hero Banner, Line Chart, Rating & Hours)
-        # -------------------------------------------------------------
-        with col1:
-            # 1. Hero Banner Card
+        st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+
+        # EXACTLY 4 Primary KPI Cards
+        c1, c2, c3, c4 = st.columns(4)
+        with c1:
             render_html("""
-            <div class="hero-banner">
-                <div style="max-width: 60%;">
-                    <div style="font-size: 11px; font-weight: 700; color: #e9d5ff; text-transform: uppercase; letter-spacing: 0.5px;">Masterclass</div>
-                    <h3 style="font-size: 18px; font-weight: 900; margin: 6px 0 4px 0; line-height: 1.2;">Online lesson with Web designer</h3>
-                    <div style="font-size: 12px; color: #f3e8ff; margin-bottom: 12px;">19.02.2025</div>
-                    <a href="#" class="hero-btn">Register now →</a>
-                </div>
-                <div style="position: absolute; right: 15px; bottom: 10px; font-size: 55px; opacity: 0.9;">
-                    💡👨‍💻
-                </div>
+            <div class="metric-container" style="border-left: 4px solid #1e3a8a;">
+                <div class="metric-label">Overall Score</div>
+                <div class="metric-value">78%</div>
+                <div class="metric-subtext subtext-positive">+6% readiness vs baseline</div>
+            </div>
+            """)
+        with c2:
+            render_html("""
+            <div class="metric-container" style="border-left: 4px solid #2563eb;">
+                <div class="metric-label">Coding & DSA</div>
+                <div class="metric-value">82%</div>
+                <div class="metric-subtext subtext-positive">+8% this month</div>
+            </div>
+            """)
+        with c3:
+            render_html("""
+            <div class="metric-container" style="border-left: 4px solid #f59e0b;">
+                <div class="metric-label">Aptitude & Logic</div>
+                <div class="metric-value">74%</div>
+                <div class="metric-subtext subtext-warning">Target: 75% (Priority)</div>
+            </div>
+            """)
+        with c4:
+            render_html("""
+            <div class="metric-container" style="border-left: 4px solid #6366f1;">
+                <div class="metric-label">Mock Tests</div>
+                <div class="metric-value">76%</div>
+                <div class="metric-subtext subtext-neutral">1 completed • 1 scheduled</div>
             </div>
             """)
 
-            # 2. Progress Trajectory Line Chart
+        st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
+
+        # Prominent "Recommended Next Step" Banner
+        render_html("""
+        <div class="rec-banner">
+            <div class="rec-badge">Recommended Next Step</div>
+            <h3 style="font-size: 18px; font-weight: 800; margin: 0 0 6px 0;">Focus on Quantitative Aptitude</h3>
+            <p style="font-size: 13px; color: #e0e7ff; margin: 0 0 14px 0; max-width: 750px; line-height: 1.5;">
+                Your Quantitative Aptitude score is currently at <b>74%</b>, which is below your target benchmark of <b>75%</b>. 
+                Complete <i>Time & Work Speed Practice</i> before taking the next placement mock simulation.
+            </p>
+        </div>
+        """)
+
+        # Main 2-Column Section: Performance Trend + Roadmap & Activity
+        col_chart, col_side = st.columns([1.3, 1])
+
+        with col_chart:
             render_html("""
-            <div class="soft-card">
-                <div class="widget-title">
-                    <span style="font-weight: 800; color: #1e293b;">Progress <span style="font-size: 11px; font-weight: 600; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 10px;">• 2025 ▼</span></span>
-                    <span style="color: #94a3b8;">•••</span>
-                </div>
+            <div class="saas-card">
+                <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Performance Trend</div>
             """)
+            
+            df_trend = pd.DataFrame({
+                "Date": ["Aug 10", "Aug 18", "Aug 25", "Sep 01", "Sep 05"],
+                "Overall Score": [68, 71, 74, 76, 78],
+                "Coding & DSA": [70, 74, 78, 80, 82],
+                "Aptitude": [65, 68, 70, 72, 74]
+            })
 
-            months = ["August", "September", "October", "November", "December", "January"]
-            values = [8.0, 12.5, 18.0, 14.2, 19.5, 24.8]
-
-            fig_prog = go.Figure()
-            fig_prog.add_trace(go.Scatter(
-                x=months,
-                y=values,
-                mode="lines+markers",
-                line=dict(color="#06b6d4", width=3, shape="spline"),
-                marker=dict(size=6, color="#06b6d4"),
-                fill="tozeroy",
-                fillcolor="rgba(6, 182, 212, 0.12)"
-            ))
-            fig_prog.update_layout(
-                margin=dict(l=20, r=20, t=10, b=20),
-                height=180,
-                xaxis=dict(showgrid=False, color="#94a3b8", tickfont=dict(size=10)),
-                yaxis=dict(showgrid=True, gridcolor="#f1f5f9", range=[0, 26], color="#94a3b8", tickfont=dict(size=9)),
+            fig_trend = px.line(
+                df_trend, 
+                x="Date", 
+                y=["Overall Score", "Coding & DSA", "Aptitude"],
+                markers=True,
+                color_discrete_sequence=["#1e3a8a", "#2563eb", "#f59e0b"]
+            )
+            fig_trend.update_layout(
+                margin=dict(l=10, r=10, t=10, b=10),
+                height=260,
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+                xaxis=dict(showgrid=False),
+                yaxis=dict(showgrid=True, gridcolor="#f1f5f9", range=[50, 100]),
                 plot_bgcolor="rgba(0,0,0,0)",
                 paper_bgcolor="rgba(0,0,0,0)"
             )
-            st.plotly_chart(fig_prog, use_container_width=True, config={"displayModeBar": False})
+            st.plotly_chart(fig_trend, use_container_width=True, config={"displayModeBar": False})
             render_html("</div>")
 
-            # 3. Dual Mini Cards (Rating & Learning Hours)
-            m_col1, m_col2 = st.columns(2)
-            with m_col1:
-                render_html("""
-                <div class="soft-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 12px; font-weight: 800; color: #1e293b;">Rating</span>
-                        <span style="font-size: 9px; color: #94a3b8;">from teachers</span>
-                    </div>
-                    <div style="display: flex; align-items: baseline; gap: 8px; margin: 8px 0 4px 0;">
-                        <span style="font-size: 26px; font-weight: 900; color: #0f172a;">8,5</span>
-                        <span class="metric-badge-pink">+15% vs last week</span>
-                    </div>
-                """)
-
-                fig_spark = go.Figure(go.Scatter(
-                    x=[1, 2, 3, 4, 5, 6, 7],
-                    y=[2, 4, 3, 7, 5, 8, 9],
-                    mode="lines",
-                    line=dict(color="#f43f5e", width=2.5, shape="spline"),
-                    fill="tozeroy",
-                    fillcolor="rgba(244, 63, 94, 0.15)"
-                ))
-                fig_spark.update_layout(
-                    margin=dict(l=0, r=0, t=0, b=0),
-                    height=50,
-                    xaxis=dict(visible=False),
-                    yaxis=dict(visible=False),
-                    plot_bgcolor="rgba(0,0,0,0)",
-                    paper_bgcolor="rgba(0,0,0,0)"
-                )
-                st.plotly_chart(fig_spark, use_container_width=True, config={"displayModeBar": False})
-                render_html("</div>")
-
-            with m_col2:
-                render_html("""
-                <div class="soft-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 12px; font-weight: 800; color: #1e293b;">Learning hours</span>
-                        <span style="font-size: 9px; color: #94a3b8;">this week ▼</span>
-                    </div>
-                """)
-
-                days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
-                hours = [1.2, 1.8, 2.2, 1.5, 2.5, 0.8, 1.1]
-                colors = ["#cffafe", "#cffafe", "#cffafe", "#cffafe", "#06b6d4", "#cffafe", "#cffafe"]
-
-                fig_bar = go.Figure(go.Bar(
-                    x=days,
-                    y=hours,
-                    marker=dict(color=colors, cornerradius=4),
-                ))
-                fig_bar.update_layout(
-                    margin=dict(l=0, r=0, t=10, b=0),
-                    height=90,
-                    xaxis=dict(showgrid=False, tickfont=dict(size=9)),
-                    yaxis=dict(visible=False),
-                    plot_bgcolor="rgba(0,0,0,0)",
-                    paper_bgcolor="rgba(0,0,0,0)"
-                )
-                st.plotly_chart(fig_bar, use_container_width=True, config={"displayModeBar": False})
-                render_html("</div>")
-
-        # -------------------------------------------------------------
-        # COLUMN 2: Center (Days Report Gauge, Teachers, Homework)
-        # -------------------------------------------------------------
-        with col2:
-            # 1. Days Report Radial Gauge
+        with col_side:
+            # Roadmap Preview
             render_html("""
-            <div class="soft-card">
-                <div class="widget-title">
-                    <span>Days report <span style="font-size: 10px; font-weight: 600; color: #94a3b8;">Month ▼</span></span>
-                    <span style="color: #94a3b8;">•••</span>
+            <div class="saas-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="font-size: 14px; font-weight: 700; color: #0f172a;">Placement Roadmap</span>
+                    <span style="font-size: 12px; font-weight: 700; color: #2563eb;">72% Overall</span>
                 </div>
+                <div style="background: #f1f5f9; border-radius: 999px; height: 6px; margin-bottom: 12px; overflow: hidden;">
+                    <div style="background: #1e3a8a; width: 72%; height: 100%;"></div>
+                </div>
+                <div style="font-size: 12px; line-height: 1.8;">
+                    <div>✅ <b>Programming Fundamentals</b> — 100%</div>
+                    <div>⏳ <b>Data Structures & Algorithms</b> — 82%</div>
+                    <div>⚠️ <b>Quantitative Aptitude</b> — 74% (Needs Practice)</div>
+                    <div>⏳ <b>Placement Mock Exams</b> — 76%</div>
+                </div>
+            </div>
             """)
 
-            fig_gauge = go.Figure(go.Indicator(
-                mode="gauge+number",
-                value=65,
-                number=dict(suffix="%", font=dict(size=26, family="Plus Jakarta Sans", color="#1e1b4b")),
-                gauge=dict(
-                    axis=dict(range=[0, 100], visible=False),
-                    bar=dict(color="#06b6d4", thickness=0.8),
-                    bgcolor="#f1f5f9",
-                    shape="angular"
-                )
-            ))
-            fig_gauge.update_layout(
-                margin=dict(l=10, r=10, t=10, b=0),
-                height=110,
-                paper_bgcolor="rgba(0,0,0,0)"
+            # Recent Activity Rows
+            render_html("""
+            <div class="saas-card">
+                <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Recent Activity</div>
+                <div class="activity-item">
+                    <div>
+                        <div style="font-weight: 700; font-size: 12px; color: #0f172a;">DSA Core Assessment</div>
+                        <div style="font-size: 10px; color: #64748b;">Completed 3 days ago • Python 3</div>
+                    </div>
+                    <span class="badge badge-success">85% Passed</span>
+                </div>
+                <div class="activity-item">
+                    <div>
+                        <div style="font-weight: 700; font-size: 12px; color: #0f172a;">Quantitative Speed Test 01</div>
+                        <div style="font-size: 10px; color: #64748b;">Completed 5 days ago • 10 Questions</div>
+                    </div>
+                    <span class="badge badge-warning">74% Review</span>
+                </div>
+                <div class="activity-item">
+                    <div>
+                        <div style="font-weight: 700; font-size: 12px; color: #0f172a;">Placement Simulation Mock 01</div>
+                        <div style="font-size: 10px; color: #64748b;">Completed 1 week ago • Full-Length</div>
+                    </div>
+                    <span class="badge badge-success">76% Passed</span>
+                </div>
+            </div>
+            """)
+
+    elif menu == "My Performance":
+        st.title("My Performance")
+        st.caption("Detailed breakdown of skills, benchmarks, and historical performance.")
+
+        t_filter = st.selectbox("Time Filter", ["Last 30 Days", "Last 7 Days", "Last 3 Months", "All Time"])
+
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric("Overall Score", "78%", "+6%")
+        m2.metric("Coding & DSA", "82%", "+8%")
+        m3.metric("Aptitude", "74%", "+2%")
+        m4.metric("Mock Tests", "76%", "+4%")
+
+        st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+
+        col_p1, col_p2 = st.columns(2)
+        with col_p1:
+            st.subheader("Skill vs Placement Benchmark")
+            df_comp = pd.DataFrame({
+                "Skill": ["Coding", "Aptitude", "Technical", "Mock Tests", "Verbal"],
+                "Your Score": [82, 74, 72, 76, 80],
+                "Placement Target": [85, 75, 80, 75, 75]
+            })
+            fig_bar = px.bar(
+                df_comp, 
+                x="Skill", 
+                y=["Your Score", "Placement Target"], 
+                barmode="group",
+                color_discrete_sequence=["#2563eb", "#cbd5e1"]
             )
-            st.plotly_chart(fig_gauge, use_container_width=True, config={"displayModeBar": False})
-            render_html("""
-                <div style="display: flex; justify-content: center; gap: 15px; font-size: 10px; font-weight: 700; color: #64748b;">
-                    <span><span style="color: #06b6d4;">●</span> Done</span>
-                    <span><span style="color: #cbd5e1;">●</span> Progress</span>
-                </div>
-            </div>
-            """)
+            fig_bar.update_layout(template="plotly_white", height=300)
+            st.plotly_chart(fig_bar, use_container_width=True)
 
-            # 2. Teachers / Mentors Card
-            render_html("""
-            <div class="soft-card">
-                <div class="widget-title">
-                    <span>Teachers</span>
-                    <a href="#" class="widget-link">see all</a>
-                </div>
-                <div class="teacher-row">
-                    <div style="display: flex; align-items: center;">
-                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop&crop=faces" class="teacher-avatar" />
-                        <div>
-                            <div style="font-weight: 800; font-size: 11px; color: #1e293b;">Olga Potapova</div>
-                            <div style="font-size: 9px; color: #94a3b8;">DSA & Algorithms</div>
-                        </div>
-                    </div>
-                    <span style="font-size: 12px; color: #94a3b8; border: 1px solid #e2e8f0; border-radius: 6px; padding: 2px 6px;">✉️</span>
-                </div>
-                <div class="teacher-row">
-                    <div style="display: flex; align-items: center;">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=faces" class="teacher-avatar" />
-                        <div>
-                            <div style="font-weight: 800; font-size: 11px; color: #1e293b;">Sviatosav Kush</div>
-                            <div style="font-size: 9px; color: #94a3b8;">System Design</div>
-                        </div>
-                    </div>
-                    <span style="font-size: 12px; color: #94a3b8; border: 1px solid #e2e8f0; border-radius: 6px; padding: 2px 6px;">✉️</span>
-                </div>
-                <div class="teacher-row">
-                    <div style="display: flex; align-items: center;">
-                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=faces" class="teacher-avatar" />
-                        <div>
-                            <div style="font-weight: 800; font-size: 11px; color: #1e293b;">John Daniell</div>
-                            <div style="font-size: 9px; color: #94a3b8;">Quantitative Aptitude</div>
-                        </div>
-                    </div>
-                    <span style="font-size: 12px; color: #94a3b8; border: 1px solid #e2e8f0; border-radius: 6px; padding: 2px 6px;">✉️</span>
-                </div>
-                <div class="teacher-row">
-                    <div style="display: flex; align-items: center;">
-                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=faces" class="teacher-avatar" />
-                        <div>
-                            <div style="font-weight: 800; font-size: 11px; color: #1e293b;">Irina Silviska</div>
-                            <div style="font-size: 9px; color: #94a3b8;">Discrete Logic</div>
-                        </div>
-                    </div>
-                    <span style="font-size: 12px; color: #94a3b8; border: 1px solid #e2e8f0; border-radius: 6px; padding: 2px 6px;">✉️</span>
-                </div>
-            </div>
-            """)
+        with col_p2:
+            st.subheader("Placement Readiness Index")
+            fig_radar = go.Figure(go.Scatterpolar(
+                r=[82, 74, 72, 76, 80, 82],
+                theta=['Coding', 'Aptitude', 'Technical', 'Mock Tests', 'Verbal', 'Coding'],
+                fill='toself',
+                fillcolor='rgba(37, 99, 235, 0.15)',
+                line=dict(color='#2563eb', width=2)
+            ))
+            fig_radar.update_layout(
+                polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
+                height=300,
+                margin=dict(l=30, r=30, t=20, b=20)
+            )
+            st.plotly_chart(fig_radar, use_container_width=True)
 
-            # 3. Homework / Milestones Card
-            render_html("""
-            <div class="soft-card">
-                <div class="widget-title">
-                    <span>Homework</span>
-                    <a href="#" class="widget-link">see all</a>
-                </div>
-                <div style="margin-bottom: 10px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #1e293b; margin-bottom: 4px;">
-                        <span>Math & DSA</span>
-                        <span style="color: #94a3b8; font-weight: 500;">10 tasks left</span>
-                    </div>
-                    <div style="background: #f1f5f9; border-radius: 999px; height: 6px; overflow: hidden;">
-                        <div style="background: #f43f5e; width: 70%; height: 100%; border-radius: 999px;"></div>
-                    </div>
-                </div>
-                <div>
-                    <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #1e293b; margin-bottom: 4px;">
-                        <span>Physics & Systems</span>
-                        <span style="color: #94a3b8; font-weight: 500;">04 tasks left</span>
-                    </div>
-                    <div style="background: #f1f5f9; border-radius: 999px; height: 6px; overflow: hidden;">
-                        <div style="background: #7c3aed; width: 45%; height: 100%; border-radius: 999px;"></div>
-                    </div>
-                </div>
-            </div>
-            """)
+    elif menu == "Assessments":
+        st.title("Assessments")
+        st.caption("Practice the skills required for campus placement.")
 
-        # -------------------------------------------------------------
-        # COLUMN 3: Right (Mini-Calendar, Today's Schedule, Events)
-        # -------------------------------------------------------------
-        with col3:
-            # 1. Mini-Calendar & Today's Schedule Widget (Rendered cleanly as one consolidated card)
-            render_html("""
-            <div class="soft-card">
-                <div class="widget-title">
-                    <span>January 2025</span>
-                    <span style="color: #94a3b8; font-size: 11px; cursor: pointer;">⟨ ⟩</span>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 9px; font-weight: 800; color: #94a3b8; margin-bottom: 6px;">
-                    <div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div><div>S</div>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; font-weight: 700; color: #64748b; align-items: center; margin-bottom: 12px;">
-                    <div>16</div>
-                    <div>17</div>
-                    <div class="calendar-capsule">18</div>
-                    <div class="calendar-capsule">19</div>
-                    <div class="calendar-capsule">20</div>
-                    <div class="calendar-capsule">21</div>
-                    <div class="calendar-capsule">22</div>
-                </div>
-                <div style="border-top: 1px solid #f1f5f9; padding-top: 10px; margin-top: 5px;">
-                    <div class="widget-title" style="margin-bottom: 6px;">
-                        <span style="font-size: 11px;">Today</span>
-                        <a href="#" class="widget-link" style="font-size: 10px;">see all</a>
-                    </div>
-                    <div style="font-size: 11px; margin-bottom: 6px;">
-                        <div style="display: flex; justify-content: space-between;">
-                            <span style="font-weight: 700; color: #1e293b;">📘 Book club & DSA</span>
-                            <span style="color: #94a3b8; font-size: 10px;">11:00 - 12:30</span>
-                        </div>
-                    </div>
-                    <div style="font-size: 11px; margin-bottom: 6px;">
-                        <div style="display: flex; justify-content: space-between;">
-                            <span style="font-weight: 700; color: #1e293b;">⚛️ Physics & Systems</span>
-                            <span style="color: #94a3b8; font-size: 10px;">14:30 - 15:30</span>
-                        </div>
-                    </div>
-                    <div style="font-size: 10px; font-weight: 700; color: #94a3b8; margin: 8px 0 4px 0;">Tomorrow</div>
-                    <div style="font-size: 11px;">
-                        <div style="display: flex; justify-content: space-between;">
-                            <span style="font-weight: 700; color: #1e293b;">💻 C++ Speed Test</span>
-                            <span style="color: #94a3b8; font-size: 10px;">11:00 - 12:30</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            """)
+        tab_coding, tab_aptitude = st.tabs(["💻 Coding Assessments", "🧠 Aptitude & Logic"])
 
-            # 2. Events Card
-            render_html("""
-            <div class="soft-card">
-                <div class="widget-title">
-                    <span>Events</span>
-                    <a href="#" class="widget-link">see all</a>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                    <div>
-                        <div style="font-weight: 800; font-size: 11px; color: #1e293b;">Robot Fest: Drive</div>
-                        <div style="font-size: 9px; color: #94a3b8;">Friday, 24th January 11:30 PM</div>
+        with tab_coding:
+            col_c1, col_c2, col_c3 = st.columns(3)
+            with col_c1:
+                render_html("""
+                <div class="saas-card">
+                    <div style="font-size: 11px; font-weight: 700; color: #2563eb; text-transform: uppercase;">Algorithms</div>
+                    <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 4px 0 6px 0;">DSA Core Assessment</div>
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Arrays, two-pointers, hash tables, and string manipulation.</p>
+                    <div style="font-size: 11px; color: #475569; margin-bottom: 14px;">
+                        • <b>3 Problems</b> • 45 Mins • <span class="badge badge-warning">Medium</span>
                     </div>
-                    <span style="font-size: 12px; color: #94a3b8;">🔄</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                    <div>
-                        <div style="font-weight: 800; font-size: 11px; color: #1e293b;">News: Webinar</div>
-                        <div style="font-size: 9px; color: #94a3b8;">Monday, 10th January 02:00 PM</div>
-                    </div>
-                    <span style="font-size: 12px; color: #94a3b8;">📻</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div>
-                        <div style="font-weight: 800; font-size: 11px; color: #1e293b;">English club: HR</div>
-                        <div style="font-size: 9px; color: #94a3b8;">Tuesday, 18th January 11:30 PM</div>
-                    </div>
-                    <span style="font-size: 12px; color: #94a3b8;">🎙️</span>
-                </div>
-            </div>
-            """)
+                """)
+                if st.button("Start DSA Test", key="btn_dsa", use_container_width=True, type="primary"):
+                    st.session_state.active_assessment = "DSA"
 
-    elif menu == "My Schedule" or menu == "Mock Tests":
-        st.subheader("📅 Schedule & Placement Mock Tests")
+            with col_c2:
+                render_html("""
+                <div class="saas-card">
+                    <div style="font-size: 11px; font-weight: 700; color: #2563eb; text-transform: uppercase;">Data Structures</div>
+                    <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 4px 0 6px 0;">Binary Trees & Recursion</div>
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Tree traversals, binary search trees, and DFS/BFS patterns.</p>
+                    <div style="font-size: 11px; color: #475569; margin-bottom: 14px;">
+                        • <b>2 Problems</b> • 45 Mins • <span class="badge badge-danger">Hard</span>
+                    </div>
+                </div>
+                """)
+                if st.button("Start Trees Test", key="btn_trees", use_container_width=True):
+                    st.session_state.active_assessment = "Trees"
+
+            with col_c3:
+                render_html("""
+                <div class="saas-card">
+                    <div style="font-size: 11px; font-weight: 700; color: #2563eb; text-transform: uppercase;">Fundamentals</div>
+                    <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 4px 0 6px 0;">Python & OOP Basics</div>
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Object-oriented principles, exception handling, and lambdas.</p>
+                    <div style="font-size: 11px; color: #475569; margin-bottom: 14px;">
+                        • <b>4 Problems</b> • 30 Mins • <span class="badge badge-success">Easy</span>
+                    </div>
+                </div>
+                """)
+                if st.button("Start OOP Test", key="btn_oop", use_container_width=True):
+                    st.session_state.active_assessment = "OOP"
+
+            # In-line Coding IDE Sandbox
+            st.markdown("---")
+            st.subheader("💻 Interactive Sandbox IDE: Problem Runner")
+            
+            c_desc, c_code = st.columns([1, 1])
+            with c_desc:
+                st.markdown("""
+                **Problem:** Reverse Array In-Place  
+                **Difficulty:** Easy | **Marks:** 10  
+                
+                Given an integer array `arr`, write a function to reverse the elements in-place without allocating additional array buffers.
+                
+                **Example 1:**  
+                - Input: `[1, 2, 3, 4, 5]`  
+                - Output: `[5, 4, 3, 2, 1]`  
+                """)
+            with c_code:
+                lang = st.selectbox("Runtime", ["Python 3", "JavaScript", "C++ 17", "Java 17"])
+                starter = "def reverse_array(arr: list[int]) -> list[int]:\n    # In-place reversal implementation\n    return arr[::-1]\n"
+                code = st.text_area("Code Editor", starter, height=140)
+                if st.button("▶️ Run & Evaluate Test Cases", type="primary"):
+                    with st.spinner("Executing in sandboxed runtime..."):
+                        time.sleep(0.4)
+                        st.success("✅ All 3 Test Cases Passed! Runtime: 36.4 ms | Memory: 14.1 MB")
+
+        with tab_aptitude:
+            col_a1, col_a2, col_a3 = st.columns(3)
+            with col_a1:
+                render_html("""
+                <div class="saas-card">
+                    <div style="font-size: 11px; font-weight: 700; color: #f59e0b; text-transform: uppercase;">Quantitative</div>
+                    <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 4px 0 6px 0;">Speed Math & Percentages</div>
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Time & work, ratios, profit & loss, and quick calculation tricks.</p>
+                    <div style="font-size: 11px; color: #475569; margin-bottom: 14px;">
+                        • <b>15 Questions</b> • 20 Mins • <span class="badge badge-success">Easy</span>
+                    </div>
+                </div>
+                """)
+                st.button("Start Quantitative Set", key="btn_quant", use_container_width=True, type="primary")
+
+            with col_a2:
+                render_html("""
+                <div class="saas-card">
+                    <div style="font-size: 11px; font-weight: 700; color: #f59e0b; text-transform: uppercase;">Logical</div>
+                    <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 4px 0 6px 0;">Logical Deductions & Puzzles</div>
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Seating arrangements, blood relations, and syllogisms.</p>
+                    <div style="font-size: 11px; color: #475569; margin-bottom: 14px;">
+                        • <b>15 Questions</b> • 25 Mins • <span class="badge badge-warning">Medium</span>
+                    </div>
+                </div>
+                """)
+                st.button("Start Logical Set", key="btn_logic", use_container_width=True)
+
+            with col_a3:
+                render_html("""
+                <div class="saas-card">
+                    <div style="font-size: 11px; font-weight: 700; color: #f59e0b; text-transform: uppercase;">Verbal</div>
+                    <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 4px 0 6px 0;">Verbal Ability & Comprehension</div>
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Reading comprehension, sentence correction, and vocabulary.</p>
+                    <div style="font-size: 11px; color: #475569; margin-bottom: 14px;">
+                        • <b>20 Questions</b> • 20 Mins • <span class="badge badge-success">Easy</span>
+                    </div>
+                </div>
+                """)
+                st.button("Start Verbal Set", key="btn_verbal", use_container_width=True)
+
+    elif menu == "Mock Tests":
+        st.title("Placement Mock Exams")
+        st.caption("Simulate real recruitment tests with sectional timers.")
+
         render_html("""
-        <div class="soft-card">
-            <div style="font-size: 14px; font-weight: 800; color: #1e293b; margin-bottom: 8px;">Placement Tier-1 Simulation Schedule</div>
-            <p style="font-size: 12px; color: #64748b;">Upcoming institutional simulation exams designed to assess full-stack coding, quantitative aptitude, and system design readiness.</p>
+        <div class="saas-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <span class="badge badge-info">Tier-1 Corporate Simulation</span>
+                    <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 6px 0 8px 0;">Placement Mock Simulation 2026</h3>
+                    <p style="font-size: 13px; color: #475569; max-width: 650px; line-height: 1.5;">
+                        Complete simulation covering Quantitative Math (15 Qs), Logical Reasoning (15 Qs), Verbal Ability (10 Qs), and Live Coding (2 Problems).
+                    </p>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 18px; font-weight: 800; color: #0f172a;">60 Mins</div>
+                    <div style="font-size: 11px; color: #64748b;">Sectional Timing</div>
+                </div>
+            </div>
         </div>
         """)
-        st.button("Start Full Placement Mock Simulation", type="primary")
+        st.button("Start Full Mock Exam Simulation", type="primary")
 
-    elif menu == "Projects & Assessments":
-        st.subheader("💻 Assessments Catalog")
-        a1, a2, a3 = st.columns(3)
-        with a1:
-            render_html("""
-            <div class="soft-card">
-                <div style="font-weight: 800; font-size: 14px; color: #1e293b;">DSA Core Assessment</div>
-                <div style="font-size: 11px; color: #94a3b8; margin: 4px 0 8px 0;">Medium • 45 Mins • Arrays & Hash Maps</div>
-                <span class="metric-badge-pink">Score: 85% (Passed)</span>
-            </div>
-            """)
-        with a2:
-            render_html("""
-            <div class="soft-card">
-                <div style="font-weight: 800; font-size: 14px; color: #1e293b;">Quantitative Speed Test</div>
-                <div style="font-size: 11px; color: #94a3b8; margin: 4px 0 8px 0;">Easy • 30 Mins • Speed Math & Logic</div>
-                <span class="metric-badge-pink">Score: 74% (Passed)</span>
-            </div>
-            """)
-        with a3:
-            render_html("""
-            <div class="soft-card">
-                <div style="font-weight: 800; font-size: 14px; color: #1e293b;">Placement Mock 2026</div>
-                <div style="font-size: 11px; color: #94a3b8; margin: 4px 0 8px 0;">Hard • 60 Mins • Full-Length Simulation</div>
-                <span class="metric-badge-pink">Score: 76% (Passed)</span>
-            </div>
-            """)
+    elif menu == "My Roadmap":
+        st.title("My Placement Roadmap")
+        st.caption("Vertical timeline and milestone tracking for campus placements.")
 
-    elif menu == "Live Coding IDE":
-        st.subheader("💻 Sandboxed Coding Assessment IDE")
-        col_desc, col_editor = st.columns([1, 1])
-        with col_desc:
+        render_html("""
+        <div class="saas-card">
+            <div class="timeline-item">
+                <div class="step-number step-done">✓</div>
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: 800; font-size: 14px; color: #0f172a;">1. Programming Fundamentals</span>
+                        <span class="badge badge-success">100% Completed</span>
+                    </div>
+                    <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">C++, Java, and Python fundamentals, control structures, and basic functions.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="step-number step-active">2</div>
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: 800; font-size: 14px; color: #0f172a;">2. Data Structures & Algorithms</span>
+                        <span class="badge badge-info">82% In Progress</span>
+                    </div>
+                    <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Arrays, LinkedLists, Stacks, Queues, Trees, Graphs, and Dynamic Programming.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="step-number" style="background: #f59e0b; color: white;">3</div>
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: 800; font-size: 14px; color: #0f172a;">3. Quantitative & Logical Aptitude</span>
+                        <span class="badge badge-warning">74% Needs Practice</span>
+                    </div>
+                    <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Speed math, permutations, probability, logical puzzles, and data interpretation.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="step-number step-active">4</div>
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: 800; font-size: 14px; color: #0f172a;">4. Placement Mock Exams</span>
+                        <span class="badge badge-info">76% In Progress</span>
+                    </div>
+                    <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Full-length MNC pattern tests with sectional cutoffs.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="step-number">5</div>
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: 800; font-size: 14px; color: #0f172a;">5. Core Engineering & HR Interview Prep</span>
+                        <span class="badge" style="background: #f1f5f9; color: #64748b;">25% Scheduled</span>
+                    </div>
+                    <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Operating Systems, DBMS, Computer Networks, System Design, and Behavioral HR.</p>
+                </div>
+            </div>
+        </div>
+        """)
+
+    elif menu == "Analysis & Suggestions":
+        st.title("Analysis & Suggestions")
+        st.caption("AI-grounded performance insights and priority actions.")
+
+        col_str, col_weak = st.columns(2)
+        with col_str:
             render_html("""
-            <div class="soft-card">
-                <div style="font-weight: 800; font-size: 14px; color: #1e293b;">Problem: Reverse Array In-Place</div>
-                <p style="font-size: 12px; color: #64748b; margin-top: 6px;">Given an array of integers <code>arr</code>, write a function to reverse the array in-place without using extra memory.</p>
-                <div style="font-size: 11px; color: #94a3b8; margin-top: 10px;">
-                    <b>Example:</b> Input: [1, 2, 3, 4, 5] → Output: [5, 4, 3, 2, 1]
+            <div class="saas-card" style="border-top: 4px solid #10b981;">
+                <div style="font-size: 14px; font-weight: 800; color: #065f46; margin-bottom: 8px;">Identified Strengths</div>
+                <div style="font-size: 12px; line-height: 1.8; color: #334155;">
+                    <div>• <b>Coding & Problem Solving (82%)</b> — Fast implementation in Python & C++.</div>
+                    <div>• <b>Verbal Ability (80%)</b> — Strong reading comprehension & sentence logic.</div>
+                    <div>• <b>Data Structures (85%)</b> — High accuracy on arrays, strings, and hash maps.</div>
                 </div>
             </div>
             """)
-        with col_editor:
-            lang = st.selectbox("Language", ["Python 3", "JavaScript", "C++ 17", "Java 17"])
-            starter = "def reverse_array(arr: list[int]) -> list[int]:\n    # Write your solution here\n    return arr[::-1]\n"
-            code = st.text_area("Code Editor", starter, height=180)
-            if st.button("▶️ Run & Evaluate Test Cases", type="primary"):
-                with st.spinner("Executing in sandboxed container..."):
-                    time.sleep(0.4)
-                    st.success("✅ All 3 Test Cases Passed! Runtime: 38.2 ms | Memory: 14.2 MB")
 
-    elif menu == "Grades & Performance" or menu == "Message":
-        st.subheader("📊 Performance Trajectory & Mentorship")
-        df_trend = pd.DataFrame({
-            "Month": ["Aug", "Sep", "Oct", "Nov", "Dec", "Jan"],
-            "Overall Score": [68, 71, 74, 76, 78, 85],
-            "Coding Score": [70, 74, 78, 80, 82, 88]
+        with col_weak:
+            render_html("""
+            <div class="saas-card" style="border-top: 4px solid #f59e0b;">
+                <div style="font-size: 14px; font-weight: 800; color: #92400e; margin-bottom: 8px;">Priority Weaknesses</div>
+                <div style="font-size: 12px; line-height: 1.8; color: #334155;">
+                    <div>• <b>Quantitative Math (74%)</b> — Below the 75% placement readiness cutoff.</div>
+                    <div>• <b>Time & Work Calculations</b> — Lower speed on complex proportion problems.</div>
+                    <div>• <b>Operating Systems Core (68%)</b> — Review memory management and paging.</div>
+                </div>
+            </div>
+            """)
+
+        render_html("""
+        <div class="saas-card">
+            <div style="font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">Actionable Recommendation</div>
+            <p style="font-size: 13px; color: #475569; margin: 0; line-height: 1.5;">
+                Practice <b>Quantitative Aptitude Set 3</b> focusing on speed arithmetic before attempting Placement Mock 02. Raising your score by 2% will promote your profile to the <b>Tier-1 Placement Ready</b> cohort.
+            </p>
+        </div>
+        """)
+
+    elif menu == "Profile":
+        st.title("Student Profile")
+        st.caption("Institutional Academic & Placement Profile")
+
+        render_html("""
+        <div class="saas-card">
+            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                <div style="width: 50px; height: 50px; background: #1e3a8a; border-radius: 12px; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800;">
+                    RV
+                </div>
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0;">Rohan Verma</h3>
+                    <div style="font-size: 12px; color: #64748b;">Roll No: 2022CSE101 • Institutional ID: STU-CSE-401</div>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; font-size: 13px; color: #334155; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+                <div><b>Department:</b> Computer Science & Eng.</div>
+                <div><b>Year & Section:</b> Year 4 • Section A</div>
+                <div><b>Academic CGPA:</b> 8.8 / 10.0</div>
+                <div><b>Placement Status:</b> <span class="badge badge-success">Placement Ready</span></div>
+                <div><b>Primary Mentor:</b> Prof. Arvind Sharma</div>
+                <div><b>Target Tier:</b> Tier-1 Product & MNC</div>
+            </div>
+        </div>
+        """)
+
+# ==============================================================================
+# 6. FACULTY VIEWS
+# ==============================================================================
+elif selected_role == "FACULTY":
+    if menu == "Dashboard":
+        st.title("Faculty Coordinator Dashboard")
+        st.caption("Prof. Arvind Sharma • CSE Department Placement Lead")
+
+        f1, f2, f3, f4 = st.columns(4)
+        with f1:
+            render_html("""
+            <div class="metric-container" style="border-left: 4px solid #1e3a8a;">
+                <div class="metric-label">Assigned Students</div>
+                <div class="metric-value">120</div>
+                <div class="metric-subtext subtext-neutral">Cohort CSE 4th Year</div>
+            </div>
+            """)
+        with f2:
+            render_html("""
+            <div class="metric-container" style="border-left: 4px solid #059669;">
+                <div class="metric-label">Average Score</div>
+                <div class="metric-value">74.8%</div>
+                <div class="metric-subtext subtext-positive">+3.2% vs last term</div>
+            </div>
+            """)
+        with f3:
+            render_html("""
+            <div class="metric-container" style="border-left: 4px solid #2563eb;">
+                <div class="metric-label">Assessment Completion</div>
+                <div class="metric-value">86.4%</div>
+                <div class="metric-subtext subtext-positive">Target: 80%</div>
+            </div>
+            """)
+        with f4:
+            render_html("""
+            <div class="metric-container" style="border-left: 4px solid #dc2626;">
+                <div class="metric-label">Needs Attention</div>
+                <div class="metric-value">12</div>
+                <div class="metric-subtext subtext-warning">At-Risk (<60% score)</div>
+            </div>
+            """)
+
+        st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
+        st.subheader("⚠️ Students Needing Immediate Mentorship")
+        
+        df_risk = pd.DataFrame([
+            {"Student ID": "2022CSE109", "Name": "Siddharth Gupta", "Dept": "CSE", "Score": "58%", "Reason": "Low Aptitude (52%)", "Action": "Assign Practice Set"},
+            {"Student ID": "2022MECH121", "Name": "Harsh Vardhan", "Dept": "MECH", "Score": "52%", "Reason": "Low Coding (48%)", "Action": "Schedule Doubt Session"},
+            {"Student ID": "2022CIVIL112", "Name": "Kavita Reddy", "Dept": "CIVIL", "Score": "54%", "Reason": "Low Overall Score (54%)", "Action": "Review Roadmap"}
+        ])
+        st.dataframe(df_risk, use_container_width=True)
+
+    elif menu == "Students Directory":
+        st.title("Students Directory")
+        st.caption("Search, filter, and inspect student cohort readiness.")
+
+        col_s1, col_s2, col_s3 = st.columns([2, 1, 1])
+        with col_s1:
+            search_q = st.text_input("Search student by name or Roll ID", "")
+        with col_s2:
+            dept_f = st.selectbox("Department", ["All", "CSE", "ECE", "EEE", "MECH", "CIVIL"])
+        with col_s3:
+            perf_f = st.selectbox("Status Filter", ["All", "Placement Ready (>=75%)", "At-Risk (<60%)"])
+
+        df_all_students = pd.DataFrame([
+            {"Roll ID": "2022CSE101", "Name": "Rohan Verma", "Dept": "CSE", "Year": 4, "Overall": "78%", "Coding": "82%", "Aptitude": "74%", "Status": "Ready"},
+            {"Roll ID": "2022ECE102", "Name": "Ananya Iyer", "Dept": "ECE", "Year": 4, "Overall": "74%", "Coding": "75%", "Aptitude": "72%", "Status": "In Progress"},
+            {"Roll ID": "2022CSE104", "Name": "Pooja Hegde", "Dept": "CSE", "Year": 4, "Overall": "92%", "Coding": "95%", "Aptitude": "88%", "Status": "Top Performer"},
+            {"Roll ID": "2022CSE109", "Name": "Siddharth Gupta", "Dept": "CSE", "Year": 4, "Overall": "58%", "Coding": "62%", "Aptitude": "52%", "Status": "At-Risk"},
+            {"Roll ID": "2022MECH103", "Name": "Vikram Singh", "Dept": "MECH", "Year": 4, "Overall": "68%", "Coding": "70%", "Aptitude": "66%", "Status": "In Progress"}
+        ])
+        st.dataframe(df_all_students, use_container_width=True)
+
+    elif menu == "Student Deep-Dive":
+        st.title("Student Deep-Dive Inspection")
+        st.caption("Inspect individual student performance and recommend interventions.")
+
+        s_select = st.selectbox("Select Student", ["2022CSE101 - Rohan Verma", "2022CSE109 - Siddharth Gupta", "2022CSE104 - Pooja Hegde"])
+        
+        st.markdown("### Profile Summary: Rohan Verma (2022CSE101)")
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Coding & DSA", "82%")
+        c2.metric("Aptitude", "74%")
+        c3.metric("Placement Mock", "76%")
+
+        render_html("""
+        <div class="saas-card">
+            <div style="font-weight: 700; font-size: 14px; color: #0f172a; margin-bottom: 6px;">Faculty Mentorship Note</div>
+            <p style="font-size: 13px; color: #475569; margin: 0;">
+                Strong problem-solving capability in dynamic programming and tree traversals. 
+                Requires targeted review on Permutations & Probability to meet Tier-1 cutoff standards.
+            </p>
+        </div>
+        """)
+
+    elif menu == "Cohort Analytics":
+        st.title("Cohort Analytics")
+        st.caption("Departmental benchmarks and skill distributions.")
+
+        df_dept_perf = pd.DataFrame({
+            "Department": ["CSE", "ECE", "EEE", "MECH", "CIVIL"],
+            "Average Score": [78.4, 73.2, 69.8, 66.5, 64.1],
+            "Placement Ready %": [84.0, 72.5, 65.0, 58.0, 52.0]
         })
-        fig = px.line(df_trend, x="Month", y=["Overall Score", "Coding Score"], markers=True, title="Performance Benchmark")
+        fig = px.bar(
+            df_dept_perf, 
+            x="Department", 
+            y=["Average Score", "Placement Ready %"], 
+            barmode="group",
+            color_discrete_sequence=["#1e3a8a", "#2563eb"]
+        )
         fig.update_layout(template="plotly_white")
         st.plotly_chart(fig, use_container_width=True)
 
     elif menu == "Profile":
-        st.subheader("👤 Student Profile")
+        st.title("Faculty Profile")
         render_html("""
-        <div class="soft-card">
-            <div style="font-weight: 800; font-size: 16px; color: #1e293b;">Anna Alekseeva</div>
-            <div style="font-size: 12px; color: #64748b; margin: 4px 0 12px 0;">anna.alekseeva@institution.edu • Roll: 2022CSE101</div>
-            <div style="font-size: 12px; color: #1e1b4b;">
-                Department: Computer Science & Engineering (Year 4)<br>
-                CGPA: 8.9 / 10.0 • Placement Readiness: <b>85%</b>
+        <div class="saas-card">
+            <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">Prof. Arvind Sharma</h3>
+            <div style="font-size: 13px; color: #64748b; margin-bottom: 12px;">Professor & Placement Coordinator • Department of Computer Science & Engineering</div>
+            <div style="font-size: 13px; color: #334155;">
+                • Employee ID: <b>FAC-CSE-101</b><br>
+                • Institutional Email: <b>prof.sharma@institution.edu</b><br>
+                • Assigned Cohort: <b>Year 4 CSE (120 Students)</b>
             </div>
         </div>
         """)
 
-# ==========================================
-# FACULTY ROLE VIEWS
-# ==========================================
-elif selected_role == "FACULTY":
-    st.title("Faculty Coordinator Dashboard")
-    st.caption("Prof. Arvind Sharma • CSE Department Placement Lead")
-    
-    f1, f2, f3, f4 = st.columns(4)
-    f1.metric("Assigned Students", "120", "Cohort CSE 4th Year")
-    f2.metric("Average Score", "74.8%", "+3.2% vs last term")
-    f3.metric("Assessment Completion", "86.4%", "Target: 80%")
-    f4.metric("Needs Attention", "12", "At-Risk (<60%)")
-
-    st.subheader("⚠️ Students Needing Immediate Attention")
-    df_risk = pd.DataFrame([
-        {"Student ID": "2022CSE109", "Name": "Siddharth Gupta", "Dept": "CSE", "Score": "58%", "Reason": "Low Aptitude (52%)"},
-        {"Student ID": "2022MECH121", "Name": "Harsh Vardhan", "Dept": "MECH", "Score": "52%", "Reason": "Low Coding (48%)"},
-        {"Student ID": "2022CIVIL112", "Name": "Kavita Reddy", "Dept": "CIVIL", "Score": "54%", "Reason": "Low Overall Score (54%)"}
-    ])
-    st.dataframe(df_risk, use_container_width=True)
-
-# ==========================================
-# MANAGEMENT ROLE VIEWS
-# ==========================================
+# ==============================================================================
+# 7. MANAGEMENT VIEWS
+# ==============================================================================
 elif selected_role == "MANAGEMENT":
-    st.title("Institution Governance Dashboard")
-    st.caption("Dr. Rajeshwar Rao • Dean of Placements")
-    
-    m1, m2, m3, m4, m5 = st.columns(5)
-    m1.metric("Total Students", "25", "Active in Training")
-    m2.metric("Total Faculty", "2", "Coordinators")
-    m3.metric("Average Score", "74.8%", "+4.1% this term")
-    m4.metric("Placement Ready", "72.0%", "Score >= 75%")
-    m5.metric("Completion Rate", "88.5%", "Target: 85%")
+    if menu == "Dashboard":
+        st.title("Institution Governance Dashboard")
+        st.caption("Dr. Rajeshwar Rao • Dean of Placements")
 
-    st.subheader("Department Placement Performance Rankings")
-    df_depts = pd.DataFrame([
-        {"Department": "CSE", "Enrolled": 120, "Avg Score": "78.4%", "Placement Ready Rate": "84.0%", "Status": "On Track"},
-        {"Department": "ECE", "Enrolled": 90, "Avg Score": "73.2%", "Placement Ready Rate": "72.5%", "Status": "On Track"},
-        {"Department": "EEE", "Enrolled": 60, "Avg Score": "69.8%", "Placement Ready Rate": "65.0%", "Status": "Needs Focus"},
-        {"Department": "MECH", "Enrolled": 75, "Avg Score": "66.5%", "Placement Ready Rate": "58.0%", "Status": "Needs Focus"},
-        {"Department": "CIVIL", "Enrolled": 45, "Avg Score": "64.1%", "Placement Ready Rate": "52.0%", "Status": "Needs Focus"}
-    ])
-    st.dataframe(df_depts, use_container_width=True)
+        m1, m2, m3, m4, m5 = st.columns(5)
+        m1.metric("Total Students", "25", "Active in Portal")
+        m2.metric("Total Faculty", "2", "Coordinators")
+        m3.metric("Average Score", "74.8%", "+4.1% this term")
+        m4.metric("Placement Ready", "72.0%", "Score >= 75%")
+        m5.metric("Completion Rate", "88.5%", "Target: 85%")
 
-render_html("<div style='height: 30px;'></div>")
-st.caption("Robotech • Placement Training Portal • University Edition")
+        st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
+        st.subheader("Department Placement Performance Rankings")
+        
+        df_mgmt_depts = pd.DataFrame([
+            {"Department": "CSE", "Enrolled": 120, "Avg Score": "78.4%", "Placement Ready Rate": "84.0%", "Status": "On Track"},
+            {"Department": "ECE", "Enrolled": 90, "Avg Score": "73.2%", "Placement Ready Rate": "72.5%", "Status": "On Track"},
+            {"Department": "EEE", "Enrolled": 60, "Avg Score": "69.8%", "Placement Ready Rate": "65.0%", "Status": "Needs Focus"},
+            {"Department": "MECH", "Enrolled": 75, "Avg Score": "66.5%", "Placement Ready Rate": "58.0%", "Status": "Needs Focus"},
+            {"Department": "CIVIL", "Enrolled": 45, "Avg Score": "64.1%", "Placement Ready Rate": "52.0%", "Status": "Needs Focus"}
+        ])
+        st.dataframe(df_mgmt_depts, use_container_width=True)
+
+    elif menu == "Student Management":
+        st.title("Student Management")
+        st.caption("Provision students, assign cohort leads, and manage active status.")
+
+        df_s_mgmt = pd.DataFrame([
+            {"Student ID": "2022CSE101", "Name": "Rohan Verma", "Email": "rohan.verma@institution.edu", "Dept": "CSE", "Year": 4, "Status": "ACTIVE"},
+            {"Student ID": "2022ECE102", "Name": "Ananya Iyer", "Email": "ananya.iyer@institution.edu", "Dept": "ECE", "Year": 4, "Status": "ACTIVE"},
+            {"Student ID": "2022MECH103", "Name": "Vikram Singh", "Email": "vikram.singh@institution.edu", "Dept": "MECH", "Year": 4, "Status": "ACTIVE"},
+            {"Student ID": "2022CSE109", "Name": "Siddharth Gupta", "Email": "siddharth.gupta@institution.edu", "Dept": "CSE", "Year": 4, "Status": "ACTIVE"},
+        ])
+        st.dataframe(df_s_mgmt, use_container_width=True)
+
+        with st.expander("➕ Provision New Student"):
+            ns_name = st.text_input("Full Name")
+            ns_email = st.text_input("Institutional Email")
+            ns_dept = st.selectbox("Department", ["CSE", "ECE", "EEE", "MECH", "CIVIL"])
+            if st.button("Provision Student", type="primary"):
+                st.success(f"Student '{ns_name}' successfully provisioned!")
+
+    elif menu == "Faculty Management":
+        st.title("Faculty Management")
+        st.caption("Manage faculty coordinators and department appointments.")
+
+        df_f_mgmt = pd.DataFrame([
+            {"Employee ID": "FAC-CSE-101", "Name": "Prof. Arvind Sharma", "Email": "prof.sharma@institution.edu", "Dept": "CSE", "Role": "Placement Lead", "Status": "ACTIVE"},
+            {"Employee ID": "FAC-ECE-202", "Name": "Dr. Neha Patel", "Email": "dr.patel@institution.edu", "Dept": "ECE", "Role": "Coordinator", "Status": "ACTIVE"}
+        ])
+        st.dataframe(df_f_mgmt, use_container_width=True)
+
+    elif menu == "Assessment Authoring":
+        st.title("Assessment Authoring & Configuration")
+        st.caption("Create and publish curriculum-aligned assessments.")
+
+        with st.expander("➕ Create New Assessment", expanded=True):
+            st.text_input("Assessment Title", "Graph Algorithms & Shortest Path")
+            col_a1, col_a2 = st.columns(2)
+            with col_a1:
+                st.selectbox("Type", ["CODING", "APTITUDE", "MOCK"])
+                st.number_input("Duration (Minutes)", 15, 180, 45)
+            with col_a2:
+                st.selectbox("Difficulty", ["Easy", "Medium", "Hard"])
+                st.number_input("Passing Score (%)", 40, 100, 60)
+            if st.button("Publish Assessment to Students", type="primary"):
+                st.success("Assessment published successfully to all department cohorts!")
+
+    elif menu == "Permission Matrix (RBAC)":
+        st.title("🛡️ Granular RBAC & Permission Matrix")
+        st.caption("Inspect and grant/revoke individual permission overrides with audit tracking.")
+
+        target_fac = st.selectbox("Select Coordinator", ["Prof. Arvind Sharma (CSE Placement Lead)", "Dr. Neha Patel (ECE Coordinator)"])
+
+        df_perms = pd.DataFrame([
+            {"Permission": "VIEW_STUDENT_PERFORMANCE", "Role Default": "Granted", "Override": "None", "Effective": "Granted"},
+            {"Permission": "VIEW_STUDENT_RESULTS", "Role Default": "Granted", "Override": "None", "Effective": "Granted"},
+            {"Permission": "MANAGE_ASSESSMENTS", "Role Default": "Restricted", "Override": "Granted by Admin", "Effective": "Granted"},
+            {"Permission": "MANAGE_STUDENTS", "Role Default": "Restricted", "Override": "None", "Effective": "Restricted"},
+            {"Permission": "MANAGE_PERMISSIONS", "Role Default": "Restricted", "Override": "None", "Effective": "Restricted"}
+        ])
+        st.dataframe(df_perms, use_container_width=True)
+
+        col_p1, col_p2 = st.columns(2)
+        with col_p1:
+            p_to_grant = st.selectbox("Select Permission to Grant", ["MANAGE_ASSESSMENTS", "MANAGE_STUDENTS", "MANAGE_MOCK_TESTS"])
+            if st.button("✅ Grant Permission Override"):
+                st.session_state.audit_logs.insert(0, {
+                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "user": "admin@institution.edu",
+                    "role": "MANAGEMENT",
+                    "action": "GRANT_PERMISSION",
+                    "target": target_fac,
+                    "details": f"Granted permission override '{p_to_grant}'"
+                })
+                st.success(f"Permission '{p_to_grant}' granted and recorded in audit log!")
+        with col_p2:
+            p_to_revoke = st.selectbox("Select Permission to Revoke", ["MANAGE_ASSESSMENTS", "VIEW_STUDENT_PERFORMANCE"])
+            if st.button("🚫 Revoke Permission Override"):
+                st.session_state.audit_logs.insert(0, {
+                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "user": "admin@institution.edu",
+                    "role": "MANAGEMENT",
+                    "action": "REVOKE_PERMISSION",
+                    "target": target_fac,
+                    "details": f"Revoked permission override '{p_to_revoke}'"
+                })
+                st.warning(f"Permission '{p_to_revoke}' revoked and recorded in audit log!")
+
+    elif menu == "Reports & CSV Export":
+        st.title("Placement Reports & CSV Export")
+        st.caption("Generate institution-wide performance records.")
+
+        df_export = pd.DataFrame([
+            {"Student ID": "2022CSE101", "Name": "Rohan Verma", "Dept": "CSE", "Year": 4, "Overall Score": 78, "Coding": 82, "Aptitude": 74, "Status": "Placement Ready"},
+            {"Student ID": "2022ECE102", "Name": "Ananya Iyer", "Dept": "ECE", "Year": 4, "Overall Score": 74, "Coding": 75, "Aptitude": 72, "Status": "In Progress"},
+            {"Student ID": "2022CSE104", "Name": "Pooja Hegde", "Dept": "CSE", "Year": 4, "Overall Score": 92, "Coding": 95, "Aptitude": 88, "Status": "Top Performer"},
+            {"Student ID": "2022CSE109", "Name": "Siddharth Gupta", "Dept": "CSE", "Year": 4, "Overall Score": 58, "Coding": 62, "Aptitude": 52, "Status": "Needs Support"}
+        ])
+        st.dataframe(df_export, use_container_width=True)
+        csv_data = df_export.to_csv(index=False).encode('utf-8')
+        st.download_button("📥 Download CSV Performance Report", csv_data, "placement_performance_report.csv", "text/csv", type="primary")
+
+    elif menu == "Audit Logs":
+        st.title("📜 Security & System Audit Trail")
+        st.caption("Immutable system governance and access log.")
+        st.dataframe(pd.DataFrame(st.session_state.audit_logs), use_container_width=True)
+
+    elif menu == "System Settings":
+        st.title("⚙️ Placement Scoring Settings")
+        st.caption("Configure centralized weighting and at-risk alert thresholds.")
+        
+        st.markdown("**Centralized Weight Distribution:**")
+        st.markdown("- Coding & DSA: **30%**")
+        st.markdown("- Quantitative Aptitude: **25%**")
+        st.markdown("- Technical Core CS: **20%**")
+        st.markdown("- Placement Mock Exams: **15%**")
+        st.markdown("- Communication & HR: **10%**")
+        
+        st.slider("Placement Readiness Cutoff (%)", 50, 100, 75)
+        st.slider("At-Risk Alert Trigger (%)", 40, 80, 60)
+        st.button("Save Settings", type="primary")
+
+# ==============================================================================
+# 8. FOOTER
+# ==============================================================================
+st.markdown("---")
+st.caption("Placement Training Portal • Enterprise University Edition • 2026")
