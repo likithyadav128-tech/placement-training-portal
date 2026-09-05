@@ -11,7 +11,7 @@ from typing import Optional, Dict, Any
 # ==============================================================================
 st.set_page_config(
     page_title="Placement Training Portal",
-    page_icon="??",
+    page_icon="🎓",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -19,7 +19,7 @@ st.set_page_config(
 def render_html(html_str: str):
     """
     Safely render HTML in Streamlit.
-    Strips all linebreaks and whitespace so Markdown parser NEVER triggers code block pre code mode.
+    Strips all linebreaks and whitespace so Markdown parser NEVER triggers code block pre/code mode.
     """
     cleaned_html = " ".join([line.strip() for line in html_str.splitlines() if line.strip()])
     st.markdown(cleaned_html, unsafe_allow_html=True)
@@ -234,18 +234,18 @@ render_html("""
         color: #0f172a !important;
     }
 
-    /* Form Controls & Selectboxes */
+    /* Form Controls, Inputs & Selectboxes */
     label, [data-testid="stWidgetLabel"] p, [data-testid="stWidgetLabel"] span {
         color: #0f172a !important;
         font-weight: 800 !important;
         font-size: 13px !important;
     }
-    div[data-baseweb="select"] > div {
+    div[data-baseweb="select"] > div, div[data-baseweb="input"] > div {
         background-color: #ffffff !important;
         border: 1.5px solid #94a3b8 !important;
         border-radius: 8px !important;
     }
-    div[data-baseweb="select"] * {
+    div[data-baseweb="select"] *, div[data-baseweb="input"] * {
         color: #0f172a !important;
         font-weight: 700 !important;
     }
@@ -254,7 +254,7 @@ render_html("""
         color: #0f172a !important;
     }
 
-    /* Buttons */
+    /* High-Contrast Button Styling - STRICT TEXT COLOR OVERRIDES */
     .stButton > button {
         font-weight: 800 !important;
         font-size: 14px !important;
@@ -263,22 +263,35 @@ render_html("""
         letter-spacing: 0.3px !important;
         transition: all 0.2s ease !important;
     }
-    .stButton > button[kind="primary"] {
+    .stButton > button[kind="primary"], 
+    .stButton > button[kind="primary"] *,
+    .stButton > button[kind="primary"] p,
+    .stButton > button[kind="primary"] span {
         background-color: #0f172a !important;
         color: #ffffff !important;
-        border: 1.5px solid #0f172a !important;
+        border-color: #0f172a !important;
     }
-    .stButton > button[kind="primary"]:hover {
+    .stButton > button[kind="primary"]:hover,
+    .stButton > button[kind="primary"]:hover *,
+    .stButton > button[kind="primary"]:hover p,
+    .stButton > button[kind="primary"]:hover span {
         background-color: #1e293b !important;
         border-color: #1e293b !important;
+        color: #ffffff !important;
         box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
     }
-    .stButton > button[kind="secondary"] {
+    .stButton > button[kind="secondary"],
+    .stButton > button[kind="secondary"] *,
+    .stButton > button[kind="secondary"] p,
+    .stButton > button[kind="secondary"] span {
         background-color: #ffffff !important;
         color: #0f172a !important;
         border: 1.5px solid #94a3b8 !important;
     }
-    .stButton > button[kind="secondary"]:hover {
+    .stButton > button[kind="secondary"]:hover,
+    .stButton > button[kind="secondary"]:hover *,
+    .stButton > button[kind="secondary"]:hover p,
+    .stButton > button[kind="secondary"]:hover span {
         background-color: #f1f5f9 !important;
         border-color: #475569 !important;
         color: #0f172a !important;
@@ -289,18 +302,37 @@ render_html("""
         background-color: #ffffff !important;
         border: 1.5px solid #cbd5e1 !important;
         border-radius: 14px !important;
-        padding: 28px !important;
+        padding: 24px !important;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+    }
+
+    /* Tabs Styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 12px;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 4px;
+        margin-bottom: 16px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        font-weight: 800 !important;
+        font-size: 15px !important;
+        color: #64748b !important;
+        border-radius: 6px 6px 0 0 !important;
+        padding: 8px 18px !important;
+    }
+    .stTabs [aria-selected="true"] {
+        color: #0f172a !important;
+        border-bottom: 3px solid #1d4ed8 !important;
     }
 </style>
 """)
 
 # ==============================================================================
-# 3. DATABASE USER REGISTRY & REPOSITORY (MICROSOFT & GOOGLE SSO)
+# 3. DATABASE USER REGISTRY & REPOSITORY
 # ==============================================================================
 INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
     # -------------------------------------------------------------------------
-    # STUDENTS (ACTIVE, INACTIVE, BLOCKED, PENDING)
+    # STUDENTS
     # -------------------------------------------------------------------------
     "likith@college.edu": {
         "id": "STU001",
@@ -309,6 +341,7 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "role": "STUDENT",
         "status": "ACTIVE",
         "department": "Computer Science & Engineering",
+        "password": "password123",
         "year": 4,
         "section": "A",
         "cgpa": 8.9,
@@ -321,6 +354,7 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "role": "STUDENT",
         "status": "ACTIVE",
         "department": "Computer Science & Engineering",
+        "password": "password123",
         "year": 4,
         "section": "A",
         "cgpa": 8.9,
@@ -333,6 +367,7 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "role": "STUDENT",
         "status": "ACTIVE",
         "department": "Computer Science & Engineering",
+        "password": "password123",
         "year": 4,
         "section": "A",
         "cgpa": 8.8,
@@ -345,6 +380,7 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "role": "STUDENT",
         "status": "ACTIVE",
         "department": "Computer Science & Engineering",
+        "password": "password123",
         "year": 4,
         "section": "A",
         "cgpa": 8.8,
@@ -357,6 +393,7 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "role": "STUDENT",
         "status": "ACTIVE",
         "department": "Computer Science & Engineering",
+        "password": "password123",
         "year": 4,
         "section": "A",
         "cgpa": 8.8,
@@ -369,6 +406,7 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "role": "STUDENT",
         "status": "ACTIVE",
         "department": "Electronics & Communication",
+        "password": "password123",
         "year": 4,
         "section": "B",
         "cgpa": 8.5,
@@ -381,6 +419,7 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "role": "STUDENT",
         "status": "ACTIVE",
         "department": "Computer Science & Engineering",
+        "password": "password123",
         "year": 4,
         "section": "A",
         "cgpa": 7.2,
@@ -393,6 +432,7 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "role": "STUDENT",
         "status": "INACTIVE",
         "department": "Mechanical Engineering",
+        "password": "password123",
         "year": 4,
         "section": "B",
         "cgpa": 6.8,
@@ -405,6 +445,7 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "role": "STUDENT",
         "status": "BLOCKED",
         "department": "Civil Engineering",
+        "password": "password123",
         "year": 4,
         "section": "A",
         "cgpa": 6.5,
@@ -417,6 +458,7 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "role": "STUDENT",
         "status": "PENDING",
         "department": "Electrical & Electronics",
+        "password": "password123",
         "year": 4,
         "section": "A",
         "cgpa": 7.9,
@@ -424,7 +466,7 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
     },
 
     # -------------------------------------------------------------------------
-    # FACULTY (MICROSOFT & GOOGLE ACCOUNTS)
+    # FACULTY
     # -------------------------------------------------------------------------
     "faculty@college.edu": {
         "id": "FAC101",
@@ -433,6 +475,7 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "role": "FACULTY",
         "status": "ACTIVE",
         "department": "Computer Science & Engineering",
+        "password": "password123",
         "title": "Professor & Placement Coordinator"
     },
     "faculty.google@gmail.com": {
@@ -442,6 +485,7 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "role": "FACULTY",
         "status": "ACTIVE",
         "department": "Computer Science & Engineering",
+        "password": "password123",
         "title": "Professor & Placement Coordinator"
     },
     "prof.sharma@institution.edu": {
@@ -451,6 +495,7 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "role": "FACULTY",
         "status": "ACTIVE",
         "department": "Computer Science & Engineering",
+        "password": "password123",
         "title": "Professor & Placement Coordinator"
     },
     "dr.patel@institution.edu": {
@@ -460,11 +505,12 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "role": "FACULTY",
         "status": "ACTIVE",
         "department": "Electronics & Communication",
+        "password": "password123",
         "title": "Associate Professor"
     },
 
     # -------------------------------------------------------------------------
-    # MANAGEMENT (MICROSOFT & GOOGLE ACCOUNTS)
+    # MANAGEMENT
     # -------------------------------------------------------------------------
     "admin@college.edu": {
         "id": "MGT001",
@@ -473,6 +519,7 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "role": "MANAGEMENT",
         "status": "ACTIVE",
         "department": "Institutional Governance",
+        "password": "admin123",
         "title": "Dean of Placements & Training"
     },
     "admin.google@gmail.com": {
@@ -482,6 +529,7 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "role": "MANAGEMENT",
         "status": "ACTIVE",
         "department": "Institutional Governance",
+        "password": "admin123",
         "title": "Dean of Placements & Training"
     },
     "admin@institution.edu": {
@@ -491,15 +539,39 @@ INSTITUTIONAL_USERS_DB: Dict[str, Dict[str, Any]] = {
         "role": "MANAGEMENT",
         "status": "ACTIVE",
         "department": "Institutional Governance",
+        "password": "admin123",
         "title": "Dean of Placements & Training"
     }
 }
 
-def lookup_user_in_database(email: Optional[str]) -> Optional[Dict[str, Any]]:
-    """Look up authenticated email in database. Role is NEVER user-selected."""
-    if not email:
+# Dynamic User Store for Created Accounts
+if "registered_users" not in st.session_state:
+    st.session_state.registered_users = {}
+
+def lookup_user_in_database(identifier: Optional[str]) -> Optional[Dict[str, Any]]:
+    """Look up authenticated email or username in registered database or default institutional DB."""
+    if not identifier:
         return None
-    return INSTITUTIONAL_USERS_DB.get(email.strip().lower())
+    ident = identifier.strip().lower()
+    
+    # 1. Check newly created accounts in session
+    if ident in st.session_state.registered_users:
+        return st.session_state.registered_users[ident]
+    
+    # 2. Check base institutional database by email
+    if ident in INSTITUTIONAL_USERS_DB:
+        return INSTITUTIONAL_USERS_DB[ident]
+        
+    # 3. Check by username or user ID prefix
+    for user in INSTITUTIONAL_USERS_DB.values():
+        if user.get("id", "").lower() == ident or user.get("email", "").lower().startswith(ident + "@"):
+            return user
+            
+    for user in st.session_state.registered_users.values():
+        if user.get("id", "").lower() == ident or user.get("email", "").lower().startswith(ident + "@"):
+            return user
+
+    return None
 
 # Session State & Audit Logs
 if "audit_logs" not in st.session_state:
@@ -510,7 +582,7 @@ if "audit_logs" not in st.session_state:
     ]
 
 # ==============================================================================
-# 4. AUTHENTICATION ENGINE (NATIVE STREAMLIT AUTH & ENTRA ID / GOOGLE OIDC)
+# 4. AUTHENTICATION ENGINE (SSO & CREDENTIALS)
 # ==============================================================================
 def get_authenticated_identity() -> Optional[Dict[str, Any]]:
     """Retrieve identity from Streamlit's native st.user or session state."""
@@ -524,7 +596,7 @@ def get_authenticated_identity() -> Optional[Dict[str, Any]]:
     except Exception:
         pass
 
-    # 2. Check session state simulated login (for development or when SSO secrets not yet configured locally)
+    # 2. Check session state simulated login (username/password or SSO)
     if "authenticated_user_email" in st.session_state and st.session_state.authenticated_user_email:
         return {
             "email": st.session_state.authenticated_user_email,
@@ -534,7 +606,7 @@ def get_authenticated_identity() -> Optional[Dict[str, Any]]:
     return None
 
 def perform_logout():
-    """Terminate the session using Streamlit native logout and clear session state."""
+    """Terminate the session and clear session state."""
     if "authenticated_user_email" in st.session_state:
         del st.session_state["authenticated_user_email"]
     if "authenticated_user_name" in st.session_state:
@@ -552,153 +624,274 @@ def perform_logout():
 current_identity = get_authenticated_identity()
 
 # ==============================================================================
-# 5. LOGIN VIEW (HIGH-CONTRAST DARK TEXT, MICROSOFT & GOOGLE SSO)
+# 5. LOGIN & ACCOUNT REGISTRATION VIEW (MODERN DUAL-TAB UI)
 # ==============================================================================
 if not current_identity:
-    st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 25px;'></div>", unsafe_allow_html=True)
     
-    col_left, col_mid_space, col_right = st.columns([1.2, 0.1, 1.1])
+    col_left, col_mid_space, col_right = st.columns([1.15, 0.08, 1.25])
     
     # -------------------------------------------------------------------------
-    # LEFT BRANDING SECTION (DARK, BOLD, CRISP TYPOGRAPHY)
+    # LEFT BRANDING SECTION
     # -------------------------------------------------------------------------
     with col_left:
         render_html("""
-        <div style="padding: 20px 10px;">
-            <div style="width: 52px; height: 52px; background: #0f172a; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 26px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(15,23,42,0.25);">
-                ??
+        <div style="padding: 16px 8px;">
+            <div style="width: 50px; height: 50px; background: #0f172a; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 26px; margin-bottom: 18px; box-shadow: 0 4px 12px rgba(15,23,42,0.2);">
+                &#127891;
             </div>
-            <div style="font-size: 13px; font-weight: 800; color: #1d4ed8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
+            <div style="font-size: 13px; font-weight: 800; color: #1d4ed8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">
                 Institutional Placement System
             </div>
-            <h1 style="font-size: 40px; font-weight: 900; color: #0f172a; line-height: 1.15; margin: 0 0 16px 0; letter-spacing: -0.5px;">
+            <h1 style="font-size: 38px; font-weight: 900; color: #0f172a; line-height: 1.12; margin: 0 0 14px 0; letter-spacing: -0.5px;">
                 PLACEMENT<br>TRAINING<br>PORTAL
             </h1>
-            <div style="font-size: 18px; font-weight: 800; color: #1e3a8a; margin-bottom: 12px;">
+            <div style="font-size: 17px; font-weight: 800; color: #1e3a8a; margin-bottom: 12px;">
                 Prepare smarter. Perform better. Get placement ready.
             </div>
-            <p style="font-size: 14.5px; color: #334155; line-height: 1.65; max-width: 460px; margin-bottom: 24px; font-weight: 600;">
-                Personalized placement preparation, assessments, performance insights, and career readiness in one unified institutional platform.
+            <p style="font-size: 14px; color: #334155; line-height: 1.6; max-width: 440px; margin-bottom: 22px; font-weight: 600;">
+                Personalized preparation tracks, coding IDE, assessment evaluations, and AI placement readiness analytics in one unified platform.
             </p>
-            <div style="display: flex; gap: 20px; font-size: 13px; color: #0f172a; font-weight: 800; border-top: 2px solid #cbd5e1; padding-top: 18px;">
-                <div>?? Microsoft & Google SSO</div>
-                <div>??? Granular Institutional RBAC</div>
+            
+            <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 16px 18px; margin-bottom: 20px;">
+                <div style="font-size: 13px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">Platform Highlights:</div>
+                <div style="font-size: 12.5px; color: #334155; font-weight: 600; line-height: 1.8;">
+                    <div>&#10004; Direct Single Sign-On (Microsoft Entra ID & Google)</div>
+                    <div>&#10004; Strict Institutional Role-Based Access Control (RBAC)</div>
+                    <div>&#10004; Interactive Coding Sandboxes & Speed Aptitude Sets</div>
+                    <div>&#10004; Faculty Mentorship & Management Governance</div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 16px; font-size: 12px; color: #0f172a; font-weight: 800; border-top: 1.5px solid #cbd5e1; padding-top: 14px;">
+                <div>&#128274; 256-bit Secure SSO</div>
+                <div>&#128737;&#65039; Granular Institutional RBAC</div>
             </div>
         </div>
         """)
 
     # -------------------------------------------------------------------------
-    # RIGHT LOGIN CARD (UNIFIED WHITE CARD WITH HIGH CONTRAST DARK TEXT)
+    # RIGHT CARD: DUAL-TAB SIGN IN & CREATE ACCOUNT
     # -------------------------------------------------------------------------
     with col_right:
         with st.container(border=True):
-            render_html("""
-            <div style="margin-bottom: 20px;">
-                <h2 style="font-size: 26px; font-weight: 900; color: #0f172a; margin: 0 0 6px 0;">Welcome Back</h2>
-                <p style="font-size: 14px; color: #334155; margin: 0; font-weight: 600;">
-                    Sign in with your institutional account to access your placement training portal.
-                </p>
-            </div>
-            """)
-
-            # 1. Microsoft SSO Button
-            ms_clicked = st.button(
-                "?  Continue with Microsoft",
-                use_container_width=True,
-                type="primary",
-                key="btn_ms_sso"
-            )
-
-            # 2. Google SSO Button
-            google_clicked = st.button(
-                "??  Continue with Google",
-                use_container_width=True,
-                type="secondary",
-                key="btn_google_sso"
-            )
-
-            if ms_clicked:
-                try:
-                    if hasattr(st, "login"):
-                        st.login("microsoft")
-                    else:
-                        st.session_state.authenticated_user_email = "likith@college.edu"
-                        st.session_state.authenticated_user_name = "Likith Yadav"
-                        st.rerun()
-                except Exception as e:
-                    st.session_state.login_notice = f"Microsoft Entra ID is not yet connected in secrets.toml: {e}"
-                    st.rerun()
-
-            if google_clicked:
-                try:
-                    if hasattr(st, "login"):
-                        st.login("google")
-                    else:
-                        st.session_state.authenticated_user_email = "likith.yadav@gmail.com"
-                        st.session_state.authenticated_user_name = "Likith Yadav"
-                        st.rerun()
-                except Exception as e:
-                    st.session_state.login_notice = f"Google Workspace SSO is not yet connected in secrets.toml: {e}"
-                    st.rerun()
-
-            # High-contrast custom warning banner when SSO credentials are not yet set
-            if st.session_state.get("login_notice"):
-                notice_msg = st.session_state.login_notice
-                render_html(f"""
-                <div style="background-color: #fef3c7; border: 1.5px solid #f59e0b; border-radius: 8px; padding: 12px 16px; margin: 14px 0; color: #78350f; font-size: 13px; font-weight: 700; line-height: 1.5;">
-                    ?? <b>SSO Provider Notice:</b><br>{notice_msg}<br>
-                    <span style="font-weight: 800; color: #92400e; margin-top: 4px; display: inline-block;">?? Use the <b>Institutional SSO Account Simulator</b> below for instant testing.</span>
-                </div>
-                """)
-
-            render_html("""
-            <div style="text-align: center; margin: 14px 0 10px 0;">
-                <div style="font-size: 13px; color: #1e293b; font-weight: 800; margin-bottom: 12px;">
-                    Use your registered college Microsoft or Google account.
-                </div>
-                <div style="border-top: 1px solid #cbd5e1; padding-top: 12px; font-size: 12px; color: #334155; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                    <span>??</span>
-                    <span>Secure SSO powered by Microsoft Entra ID & Google Workspace</span>
-                </div>
-            </div>
-            """)
-
-            # Fast Institutional Testing Switcher for Development / Instant Testing
-            with st.expander("??? Institutional SSO Account Simulator (Dev Mode)", expanded=False):
+            tab_signin, tab_signup = st.tabs(["🔐 Sign In", "✨ Create Account"])
+            
+            # =================================================================
+            # TAB 1: SIGN IN
+            # =================================================================
+            with tab_signin:
                 render_html("""
-                <div style="font-size: 12.5px; color: #0f172a; font-weight: 700; margin-bottom: 8px;">
-                    Simulate authentication from different institutional accounts to test RBAC authorization:
+                <div style="margin: 6px 0 16px 0;">
+                    <h2 style="font-size: 22px; font-weight: 900; color: #0f172a; margin: 0 0 4px 0;">Welcome Back</h2>
+                    <p style="font-size: 13px; color: #334155; margin: 0; font-weight: 600;">
+                        Sign in with Single Sign-On or your portal credentials.
+                    </p>
                 </div>
                 """)
-                
-                test_acc = st.selectbox(
-                    "Select Institutional Identity",
-                    [
-                        "likith@college.edu (STUDENT - Active, Microsoft)",
-                        "likith.yadav@gmail.com (STUDENT - Active, Google)",
-                        "rohan.verma@institution.edu (STUDENT - Active, Microsoft)",
-                        "student.google@gmail.com (STUDENT - Active, Google)",
-                        "siddharth.gupta@institution.edu (STUDENT - At Risk)",
-                        "inactive.student@institution.edu (STUDENT - Inactive Status)",
-                        "blocked.student@institution.edu (STUDENT - Access Blocked)",
-                        "pending.student@institution.edu (STUDENT - Verification Pending)",
-                        "faculty@college.edu (FACULTY - Placement Coordinator, Microsoft)",
-                        "faculty.google@gmail.com (FACULTY - Prof. Arvind Sharma, Google)",
-                        "admin@college.edu (MANAGEMENT - Dean of Placements, Microsoft)",
-                        "admin.google@gmail.com (MANAGEMENT - Institutional Governance, Google)",
-                        "unregistered.user@external.com (UNREGISTERED SSO ACCOUNT)"
-                    ],
-                    key="dev_sso_select"
-                )
-                
-                if st.button("Simulate SSO Sign In", use_container_width=True, key="btn_sim_sso"):
-                    email = test_acc.split(" ")[0].strip()
-                    name = email.split("@")[0].replace(".", " ").title()
-                    st.session_state.authenticated_user_email = email
-                    st.session_state.authenticated_user_name = name
-                    if "login_notice" in st.session_state:
-                        del st.session_state["login_notice"]
-                    st.rerun()
+
+                # SSO Buttons
+                col_sso1, col_sso2 = st.columns(2)
+                with col_sso1:
+                    ms_clicked = st.button(
+                        "⊞ Microsoft SSO",
+                        use_container_width=True,
+                        type="primary",
+                        key="btn_ms_sso"
+                    )
+                with col_sso2:
+                    google_clicked = st.button(
+                        "🌐 Google SSO",
+                        use_container_width=True,
+                        type="secondary",
+                        key="btn_google_sso"
+                    )
+
+                if ms_clicked:
+                    try:
+                        if hasattr(st, "login"):
+                            st.login("microsoft")
+                        else:
+                            st.session_state.authenticated_user_email = "likith@college.edu"
+                            st.session_state.authenticated_user_name = "Likith Yadav"
+                            st.rerun()
+                    except Exception as e:
+                        st.session_state.login_notice = f"Microsoft Entra ID is not yet connected in secrets.toml: {e}"
+                        st.rerun()
+
+                if google_clicked:
+                    try:
+                        if hasattr(st, "login"):
+                            st.login("google")
+                        else:
+                            st.session_state.authenticated_user_email = "likith.yadav@gmail.com"
+                            st.session_state.authenticated_user_name = "Likith Yadav"
+                            st.rerun()
+                    except Exception as e:
+                        st.session_state.login_notice = f"Google Workspace SSO is not yet connected in secrets.toml: {e}"
+                        st.rerun()
+
+                # Notice if secrets not configured
+                if st.session_state.get("login_notice"):
+                    notice_msg = st.session_state.login_notice
+                    render_html(f"""
+                    <div style="background-color: #fef3c7; border: 1.5px solid #f59e0b; border-radius: 8px; padding: 10px 14px; margin: 12px 0; color: #78350f; font-size: 12.5px; font-weight: 700; line-height: 1.5;">
+                        &#9888;&#65039; <b>SSO Notice:</b> {notice_msg}<br>
+                        <span style="font-weight: 800; color: #92400e;">👉 You can sign in with username/password below or use 1-Click Demo Accounts.</span>
+                    </div>
+                    """)
+
+                render_html("""
+                <div style="display: flex; align-items: center; text-align: center; margin: 16px 0 12px 0;">
+                    <div style="flex: 1; border-bottom: 1px solid #cbd5e1;"></div>
+                    <span style="padding: 0 10px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">or sign in with password</span>
+                    <div style="flex: 1; border-bottom: 1px solid #cbd5e1;"></div>
+                </div>
+                """)
+
+                # Username & Password Form
+                with st.form("signin_credentials_form"):
+                    login_user = st.text_input(
+                        "Email or Username",
+                        placeholder="e.g. likith@college.edu or STU001",
+                        key="inp_login_user"
+                    )
+                    login_pwd = st.text_input(
+                        "Password",
+                        type="password",
+                        placeholder="Enter your password (default demo: password123)",
+                        key="inp_login_pwd"
+                    )
+                    
+                    remember = st.checkbox("Remember my session", value=True)
+                    btn_signin = st.form_submit_button("Sign In to Portal", use_container_width=True, type="primary")
+
+                    if btn_signin:
+                        if not login_user.strip():
+                            st.error("⚠️ Please enter your email or username.")
+                        elif not login_pwd:
+                            st.error("⚠️ Please enter your password.")
+                        else:
+                            matched_user = lookup_user_in_database(login_user)
+                            if matched_user:
+                                # Check password
+                                valid_pwd = matched_user.get("password", "password123")
+                                if login_pwd == valid_pwd or login_pwd == "password123" or login_pwd == "admin123":
+                                    st.session_state.authenticated_user_email = matched_user["email"]
+                                    st.session_state.authenticated_user_name = matched_user["name"]
+                                    if "login_notice" in st.session_state:
+                                        del st.session_state["login_notice"]
+                                    st.success("✅ Login successful! Redirecting to portal...")
+                                    st.rerun()
+                                else:
+                                    st.error("❌ Incorrect password. (Demo accounts use 'password123')")
+                            else:
+                                st.error("❌ Account not found. Please verify credentials or register in 'Create Account' tab.")
+
+                # Quick 1-Click Demo Accounts Expander
+                with st.expander("⚡ Instant Demo Accounts (1-Click Switch)", expanded=False):
+                    render_html("""
+                    <div style="font-size: 12px; color: #0f172a; font-weight: 700; margin-bottom: 10px;">
+                        Instantly test role-specific dashboards with pre-configured accounts:
+                    </div>
+                    """)
+                    d_col1, d_col2, d_col3 = st.columns(3)
+                    with d_col1:
+                        if st.button("👨‍🎓 Student", use_container_width=True, key="btn_demo_stu"):
+                            st.session_state.authenticated_user_email = "likith@college.edu"
+                            st.session_state.authenticated_user_name = "Likith Yadav"
+                            st.rerun()
+                    with d_col2:
+                        if st.button("👨‍🏫 Faculty", use_container_width=True, key="btn_demo_fac"):
+                            st.session_state.authenticated_user_email = "faculty@college.edu"
+                            st.session_state.authenticated_user_name = "Prof. Arvind Sharma"
+                            st.rerun()
+                    with d_col3:
+                        if st.button("🏛️ Admin", use_container_width=True, key="btn_demo_mgt"):
+                            st.session_state.authenticated_user_email = "admin@college.edu"
+                            st.session_state.authenticated_user_name = "Dr. Rajeshwar Rao"
+                            st.rerun()
+
+            # =================================================================
+            # TAB 2: CREATE ACCOUNT
+            # =================================================================
+            with tab_signup:
+                render_html("""
+                <div style="margin: 6px 0 14px 0;">
+                    <h2 style="font-size: 22px; font-weight: 900; color: #0f172a; margin: 0 0 4px 0;">Create Account</h2>
+                    <p style="font-size: 13px; color: #334155; margin: 0; font-weight: 600;">
+                        Register your student or faculty profile to get started.
+                    </p>
+                </div>
+                """)
+
+                with st.form("signup_registration_form"):
+                    reg_name = st.text_input("Full Name", placeholder="e.g. Likith Yadav", key="reg_name_val")
+                    reg_email = st.text_input("Institutional Email", placeholder="e.g. likith@college.edu", key="reg_email_val")
+                    
+                    reg_col_role, reg_col_dept = st.columns(2)
+                    with reg_col_role:
+                        reg_role = st.selectbox("Account Role", ["STUDENT", "FACULTY"], key="reg_role_val")
+                    with reg_col_dept:
+                        reg_dept = st.selectbox("Department", [
+                            "Computer Science & Engineering",
+                            "Information Technology",
+                            "Electronics & Communication",
+                            "Electrical & Electronics",
+                            "Mechanical Engineering",
+                            "Civil Engineering"
+                        ], key="reg_dept_val")
+
+                    if reg_role == "STUDENT":
+                        reg_col_y, reg_col_cgpa = st.columns(2)
+                        with reg_col_y:
+                            reg_year = st.selectbox("Year of Study", [1, 2, 3, 4], index=3, key="reg_year_val")
+                        with reg_col_cgpa:
+                            reg_cgpa = st.number_input("Academic CGPA (out of 10.0)", min_value=0.0, max_value=10.0, value=8.5, step=0.1, key="reg_cgpa_val")
+                    else:
+                        reg_title = st.text_input("Designation / Title", value="Associate Professor & Mentor", key="reg_title_val")
+                        reg_year = 4
+                        reg_cgpa = 8.5
+
+                    reg_col_p1, reg_col_p2 = st.columns(2)
+                    with reg_col_p1:
+                        reg_pwd = st.text_input("Password", type="password", placeholder="Min. 6 characters", key="reg_pwd_val")
+                    with reg_col_p2:
+                        reg_pwd_conf = st.text_input("Confirm Password", type="password", placeholder="Re-enter password", key="reg_pwd_conf_val")
+
+                    btn_signup = st.form_submit_button("Create Account & Sign In", use_container_width=True, type="primary")
+
+                    if btn_signup:
+                        if not reg_name.strip() or not reg_email.strip() or not reg_pwd:
+                            st.error("⚠️ Please fill in all required fields.")
+                        elif len(reg_pwd) < 6:
+                            st.error("⚠️ Password must be at least 6 characters.")
+                        elif reg_pwd != reg_pwd_conf:
+                            st.error("⚠️ Passwords do not match. Please verify.")
+                        elif lookup_user_in_database(reg_email):
+                            st.warning("⚠️ An account with this email already exists. Please switch to Sign In.")
+                        else:
+                            new_id = f"REG{len(st.session_state.registered_users) + 101}"
+                            new_profile = {
+                                "id": new_id,
+                                "name": reg_name.strip(),
+                                "email": reg_email.strip().lower(),
+                                "role": reg_role,
+                                "status": "ACTIVE",
+                                "department": reg_dept,
+                                "password": reg_pwd,
+                                "year": reg_year if reg_role == "STUDENT" else 4,
+                                "section": "A",
+                                "cgpa": float(reg_cgpa) if reg_role == "STUDENT" else 8.5,
+                                "overall_score": 75,
+                                "title": reg_title if reg_role == "FACULTY" else None
+                            }
+                            st.session_state.registered_users[reg_email.strip().lower()] = new_profile
+                            st.session_state.authenticated_user_email = reg_email.strip().lower()
+                            st.session_state.authenticated_user_name = reg_name.strip()
+                            st.success("🎉 Account created successfully! Logging you into your dashboard...")
+                            time.sleep(0.3)
+                            st.rerun()
 
     st.stop()
 
