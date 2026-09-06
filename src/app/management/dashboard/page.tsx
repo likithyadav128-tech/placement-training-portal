@@ -1,10 +1,17 @@
+export const dynamic = "force-dynamic";
 import React from "react";
 import { MetricCard, Card } from "@/components/ui/Card";
 import { prisma } from "@/lib/prisma";
 
 export default async function ManagementDashboardPage() {
-  const studentCount = await prisma.student.count();
-  const facultyCount = await prisma.faculty.count();
+  let studentCount = 25;
+  let facultyCount = 2;
+  try {
+    studentCount = (await prisma.student.count()) || 25;
+    facultyCount = (await prisma.faculty.count()) || 2;
+  } catch (e) {
+    // Fallback
+  }
 
   const deptRankings = [
     { dept: "CSE", enrolled: 120, avgScore: "78.4%", readyRate: "84.0%", status: "On Track" },
@@ -23,16 +30,14 @@ export default async function ManagementDashboardPage() {
         </p>
       </div>
 
-      {/* 5 KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <MetricCard label="Total Students" value={studentCount || 25} subtext="Active in Portal" borderColor="border-slate-900" />
-        <MetricCard label="Total Faculty" value={facultyCount || 2} subtext="Coordinators" borderColor="border-blue-600" />
+        <MetricCard label="Total Students" value={studentCount} subtext="Active in Portal" borderColor="border-slate-900" />
+        <MetricCard label="Total Faculty" value={facultyCount} subtext="Coordinators" borderColor="border-blue-600" />
         <MetricCard label="Average Score" value="74.8%" subtext="+4.1% this term" subtextColor="positive" borderColor="border-emerald-600" />
         <MetricCard label="Placement Ready" value="72.0%" subtext="Score >= 75%" subtextColor="positive" borderColor="border-indigo-600" />
         <MetricCard label="Completion Rate" value="88.5%" subtext="Target: 85%" subtextColor="positive" borderColor="border-purple-600" />
       </div>
 
-      {/* Department Placement Rankings Table */}
       <Card className="p-6">
         <div className="text-sm font-black text-slate-900 mb-1">Department Placement Performance Rankings</div>
         <p className="text-xs text-slate-500 font-medium mb-4">
@@ -58,7 +63,7 @@ export default async function ManagementDashboardPage() {
                   <td className="py-3 px-4 font-black text-slate-900">{d.avgScore}</td>
                   <td className="py-3 px-4 text-blue-700 font-bold">{d.readyRate}</td>
                   <td className="py-3 px-4 text-right">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold ${
                       d.status === "On Track" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
                     }`}>
                       {d.status}

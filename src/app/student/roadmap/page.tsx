@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import React from "react";
 import { Card } from "@/components/ui/Card";
 import { CheckCircle2, Clock, AlertCircle, Award } from "lucide-react";
