@@ -1,98 +1,160 @@
-# Placement Training Portal
+# Placement Training & Student Performance Management Portal 🎓🚀
 
-A complete, production-quality university placement training platform built with **FastAPI**, **React**, **TypeScript**, **Tailwind CSS**, and **SQLAlchemy**.
+A modern, full-stack, enterprise-grade Placement Training and Student Performance Management Portal engineered with **Next.js 14 (App Router)**, **TypeScript**, **Tailwind CSS**, **shadcn/ui**, **Lucide Icons**, **Prisma ORM**, and **PostgreSQL**, built for seamless deployment on **Vercel**.
 
----
-
-## Key Highlights
-
-- **Strict Three-Role Architecture**:
-  - **STUDENT**: Personal placement dashboard, performance analytics, coding test environment, aptitude quizzes, mock exams, personalized roadmaps, and grounded suggestions.
-  - **FACULTY**: Cohort monitoring, student search, detailed student performance records, at-risk intervention tracking, and departmental analytics.
-  - **MANAGEMENT**: College-wide KPIs, user provisioning & deactivation, assessment authoring, granular RBAC permission matrix (with instant grant/revoke overrides), exportable reports (CSV), and immutable audit logs.
-- **Enterprise Security & RBAC**:
-  - Microsoft Entra ID (Azure AD) OAuth 2.0 / OpenID Connect integration.
-  - Fast institutional login switcher for immediate testing of each role.
-  - Centralized authorization middleware (`require_role`, `require_permission`).
-  - Strict tenant isolation (students cannot query other students' scorecards).
-  - Centralized scoring engine weights (Coding 30%, Aptitude 25%, Technical 20%, Mock Tests 15%, Communication 10%).
+Migrated from Streamlit to support ~1,500+ concurrent students, faculty coordinators, and placement deans with real-time analytics, sandboxed multi-language code execution, database-driven RBAC, and Microsoft Entra ID / Google SSO.
 
 ---
 
-## Project Structure
+## 🌟 Key Features
 
-```
-placement-training-portal/
-├── backend/
-│   ├── app/
-│   │   ├── api/             # REST endpoints (auth, students, faculty, assessments, attempts, permissions, management, reports, audit)
-│   │   ├── auth/            # JWT creation, MSAL / Entra ID, authorization dependencies
-│   │   ├── middleware/      # Security headers, audit logging
-│   │   ├── models/          # Normalized SQLAlchemy models (User, Student, Faculty, Assessment, Attempt, Roadmap, AuditLog)
-│   │   ├── schemas/         # Pydantic validation schemas
-│   │   ├── seed/            # Rich demo seed script (Dean, 2 Faculty, 25 Students across 5 depts)
-│   │   ├── services/        # PerformanceService, RecommendationEngine, CodeRunnerService
-│   │   ├── config.py        # Settings configuration
-│   │   ├── database.py      # Async SQLAlchemy engine & sessions
-│   │   └── main.py          # FastAPI application entrypoint
-│   ├── tests/               # Pytest async test suite
-│   ├── requirements.txt
-│   └── .env.example
-├── frontend/
-│   ├── src/
-│   │   ├── components/      # UI library (Button, Card, Badge, Modal, Input, Alert, Skeleton) and Layouts (Sidebar, Header, MobileNav)
-│   │   ├── context/         # AuthContext with RBAC helpers
-│   │   ├── pages/
-│   │   │   ├── student/     # Dashboard, Performance, Assessments, Coding IDE, Aptitude, Mock, Result, Roadmap, Analysis, Profile
-│   │   │   ├── faculty/     # Dashboard, Student Directory, Detail, Cohort Analytics
-│   │   │   └── management/  # Dashboard, Student Mgmt, Faculty Mgmt, Assessment Authoring, Permissions Matrix, Reports, Audit Logs, Settings
-│   │   ├── routes/          # ProtectedRoute and role-based routing
-│   │   ├── services/        # Axios API client
-│   │   └── types/           # TypeScript domain definitions
-│   ├── package.json
-│   ├── tailwind.config.js
-│   └── vite.config.ts
-└── README.md
-```
+### 🎓 1. Student Portal (`/student/*`)
+- **Executive Dashboard**: Readiness score (0–100), weekly progression trends, upcoming placement drives, faculty recommendations, and quick actions.
+- **Performance Breakdown**: Cognitive aptitude, coding proficiency, domain depth, interview readiness, and radar skill charts.
+- **Assessment Center**: Timed coding and aptitude tests with automated test case evaluation, score breakdown, and submission logs.
+- **Live Coding Sandbox**: Multi-language interactive code editor supporting **Python**, **JavaScript**, **C++**, and **Java** with custom stdin/stdout and real-time execution feedback.
+- **Mock Tests**: Company-specific mock test catalog (TCS, Infosys, Amazon, etc.) with real-time countdown timers and automated performance analytics.
+- **Placement Roadmap**: Step-by-step milestone checklist from Foundation to Placement Day with interactive progress tracker.
+- **AI Analysis & Suggestions**: Weakness diagnosis, customized practice recommendations, and benchmark comparisons against batch peers.
+- **Student Profile**: Academic records (USN, CGPA, department), resume link, technical skills badges, and placement readiness badge.
+
+### 👨‍🏫 2. Faculty Coordinator Portal (`/faculty/*`)
+- **Faculty Dashboard**: Department summary metrics, batch average, high-risk student warnings, and student activity logs.
+- **Students Directory**: Filterable and searchable student roster by department, placement readiness, and USN with CSV export.
+- **Student Drilldown (`/faculty/students/[id]`)**: Comprehensive individual student profile, test attempt history, aptitude radar charts, and note addition.
+- **Cohort Analytics**: Pass rates by department, skill readiness distributions, and historical performance trends.
+- **Faculty Profile**: Coordinator credentials, department designation, and assigned student batches.
+
+### 🏛️ 3. Management & Placement Dean Portal (`/management/*`)
+- **Institution Overview**: University-wide placement statistics, department-wise comparative bar charts, and placement trajectory metrics.
+- **Student & Faculty Management**: Edit student statuses (`ACTIVE`, `INACTIVE`, `BLOCKED`, `PENDING`), adjust CGPA/readiness, manage faculty assignments.
+- **Assessment & Mock Test Authoring**: Create new coding and aptitude assessments, set time limits, minimum pass scores, and publish/draft statuses.
+- **Curriculum & Roadmap Designer**: Manage institutional training roadmaps and learning milestones.
+- **Role-Based Access Control (RBAC)**: Manage granular system permissions (`ASSESSMENT_CREATE`, `STUDENT_EDIT`, `REPORT_EXPORT`, `AUDIT_VIEW`).
+- **Reports & Data Export**: Generate and download university placement reports, student performance spreadsheets, and at-risk cohort lists.
+- **Comprehensive Audit Trail**: Real-time immutable activity logging with IP timestamps, user actions, and entity changes.
+- **System Settings**: Configure cutoff criteria, batch year defaults, maintenance mode, and sandbox execution timeouts.
 
 ---
 
-## Demo Accounts
+## 🔒 Security & Authentication Architecture
 
-| Role | Email | Password / Auth | Notes |
-|---|---|---|---|
-| **Student (High Performer)** | `student1@institution.edu` | Instant Fast-Login | Rohan Verma (CSE, 4th Year, 8.8 CGPA) |
-| **Student (Needs Support)** | `student9@institution.edu` | Instant Fast-Login | Siddharth Gupta (CSE, 4th Year, 5.8 CGPA) |
-| **Faculty Coordinator** | `prof.sharma@institution.edu` | Instant Fast-Login | Prof. Arvind Sharma (CSE Placement Lead) |
-| **Faculty In-Charge** | `dr.patel@institution.edu` | Instant Fast-Login | Dr. Neha Patel (ECE Associate Professor) |
-| **Management / Dean** | `admin@institution.edu` | Instant Fast-Login | Dr. Rajeshwar Rao (Dean Placements) |
+1. **Enterprise SSO + Credentials**:
+   - **Microsoft Entra ID (Azure AD)** OpenID Connect single sign-on.
+   - **Google OAuth 2.0** SSO.
+   - **Credentials Provider** with `bcryptjs` password hashing and database lookup.
+2. **Database-Driven Role Resolution**:
+   - Authentication verifies user identity; the database determines user role (`STUDENT`, `FACULTY`, `MANAGEMENT`).
+   - Strict server-side route guards in Next.js Middleware and `getServerSession` RBAC helper.
+3. **Instant 1-Click Demo Switcher**:
+   - Instant sign-in buttons for Student, Faculty Coordinator, and Placement Dean testing on the sign-in page.
 
 ---
 
-## Quickstart
+## ⚡ Tech Stack
 
-### 1. Backend Setup
+- **Framework**: Next.js 14 (App Router, Server Actions, Server & Client Components)
+- **Language**: TypeScript 5.x
+- **Styling**: Tailwind CSS, CSS Grid/Flexbox, Custom Design System
+- **Icons**: Lucide React
+- **Charts**: Recharts (LineChart, BarChart, RadarChart)
+- **ORM & Database**: Prisma ORM with PostgreSQL (Compatible with Neon, Supabase, Vercel Postgres, AWS RDS)
+- **Authentication**: NextAuth.js (Auth.js) with JWT Sessions
+- **Code Execution**: Sandboxed multi-language execution via isolated runner
 
+---
+
+## 🚀 Getting Started (Local Development)
+
+### 1. Clone the Repository
 ```bash
-cd backend
-pip install -r requirements.txt
-python -m app.seed.seed_data
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+git clone https://github.com/likithyadav128-tech/placement-training-portal.git
+cd placement-training-portal
 ```
 
-### 2. Frontend Setup
-
+### 2. Install Dependencies
 ```bash
-cd frontend
 npm install
+```
+
+### 3. Setup Environment Variables
+Copy `.env.example` to `.env`:
+```bash
+cp .env.example .env
+```
+Update `DATABASE_URL` with your PostgreSQL connection string and set `NEXTAUTH_SECRET`.
+
+### 4. Initialize Database Schema & Seed Data
+```bash
+npx prisma db push
+npx prisma db seed
+```
+*(Or use `npx ts-node --compiler-options "{\"module\":\"CommonJS\"}" prisma/seed.ts`)*
+
+### 5. Start Development Server
+```bash
 npm run dev
 ```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-Visit: `http://localhost:5173`
+---
 
-### 3. Run Backend Test Suite
+## ☁️ Deploying to Vercel (Production)
 
+### Step 1: Create a PostgreSQL Database
+You can use any cloud PostgreSQL provider:
+- **Neon Database** ([neon.tech](https://neon.tech)) - Free serverless Postgres
+- **Supabase** ([supabase.com](https://supabase.com)) - Free managed Postgres
+- **Vercel Postgres** (Built directly into Vercel)
+
+Obtain your `DATABASE_URL` connection string (e.g., `postgresql://user:password@ep-xyz.us-east-2.aws.neon.tech/neondb?sslmode=require`).
+
+### Step 2: Push Repository to GitHub
 ```bash
-cd backend
-pytest -v
+git add .
+git commit -m "Migrate Streamlit Placement Portal to Next.js 14 full-stack application"
+git push origin main
 ```
+
+### Step 3: Deploy on Vercel
+1. Go to [Vercel Dashboard](https://vercel.com/new).
+2. Import the `placement-training-portal` repository.
+3. In **Environment Variables**, add the following:
+   | Variable | Value / Description |
+   |---|---|
+   | `DATABASE_URL` | Your Cloud PostgreSQL connection string |
+   | `NEXTAUTH_SECRET` | Generate a random 32-char secret (e.g. `openssl rand -base64 32`) |
+   | `NEXTAUTH_URL` | Your Vercel deployment URL (e.g. `https://your-app.vercel.app`) |
+   | `AZURE_AD_CLIENT_ID` | Microsoft Entra ID App Client ID |
+   | `AZURE_AD_CLIENT_SECRET` | Microsoft Entra ID App Secret Value |
+   | `AZURE_AD_TENANT_ID` | `common` or your institutional Tenant ID |
+   | `GOOGLE_CLIENT_ID` | Google OAuth Client ID |
+   | `GOOGLE_CLIENT_SECRET` | Google OAuth Client Secret |
+
+4. Click **Deploy**.
+
+### Step 4: Run Prisma Migrations on Production DB
+In your Vercel Project Settings or locally with production `DATABASE_URL`:
+```bash
+npx prisma db push
+npx ts-node --compiler-options "{\"module\":\"CommonJS\"}" prisma/seed.ts
+```
+
+### Step 5: Configure Microsoft Entra ID Redirect URIs
+In Azure Portal > App Registrations > Your App > Authentication:
+- Add Redirect URI: `https://your-app.vercel.app/api/auth/callback/azure-ad`
+
+---
+
+## 👥 Demo User Accounts (Pre-Seeded)
+
+| Role | Email | Password | Details |
+|---|---|---|---|
+| **Student** | `likith@student.college.edu` | `password123` | Dept: CSE, USN: 1MS22CS045 |
+| **Faculty Coordinator** | `coordinator@college.edu` | `password123` | Dept: CSE, Employee: FAC-CSE-01 |
+| **Placement Dean** | `dean@college.edu` | `password123` | University Placement Office |
+
+---
+
+## 📄 License
+This project is licensed under the MIT License.
